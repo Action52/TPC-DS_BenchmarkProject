@@ -1,0 +1,46 @@
+version: "3.3"
+services:
+  spark-master:
+    build:
+      dockerfile: ./spark-image/Dockerfile
+      args:
+        SPARK_NODE_TYPE: master
+    image: alfredo.leon/spark:latest
+    ports:
+      - 8080:8080
+      - 7077:7077
+    volumes:
+       - ../data:/project
+    hostname: spark-master
+    networks:
+      - spark_sql_network
+    environment:
+      SPARK_NODE_TYPE: "master"
+  spark-worker-a:
+    build:
+      dockerfile: ./spark-image/Dockerfile
+      args:
+        SPARK_NODE_TYPE: worker
+    image: alfredo.leon/spark:latest
+    depends_on:
+      - spark-master
+    hostname: spark-worker-a
+    networks:
+      - spark_sql_network
+    volumes:
+      - ../data:/project
+    environment:
+      SPARK_NODE_TYPE: "worker"
+  tpcds:
+    build:
+      dockerfile: ./tpcds-image/Dockerfile
+    image: alfredo.leon/tpcds:latest
+    hostname: spark-driver
+    networks:
+      - spark_sql_network
+    volumes:
+      - ../data:/project
+    depends_on:
+      - spark-master
+networks:
+  spark_sql_network:
