@@ -33,8 +33,10 @@ RUN yum install -y nano
 RUN yum install -y python3
 WORKDIR home
 RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
-WORKDIR TDC-DS_BenchmarkProject/script
-RUN python3 app_menu.py
+WORKDIR ./TDC-DS_BenchmarkProject
+RUN git fetch && git checkout isa
+WORKDIR ./script
+#RUN python3 app_menu.py
 # C) INGEST THE DATA
 # D) CREATE THE QUERIES
 # E) EXECUTE THE QUERIES
