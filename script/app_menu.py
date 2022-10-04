@@ -14,14 +14,7 @@ def print_menu():
 def o1_generatedata():
     print(" ")
     print("Generate the data")
-    scale=1
-    while(True):
-        try:
-            scale = float(input('[PARAMS] Enter the scale factor: '))
-            break
-        except:
-            print("ERROR --- Incorrect input.")
-            continue
+    scale = float(input('[PARAMS] Enter the scale factor: '))
     
     print(" ")
     os.chdir("/tpcds-kit/tools")
