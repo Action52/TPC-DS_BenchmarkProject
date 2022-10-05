@@ -3,6 +3,7 @@ import csv
 
 # Print Options
 definiton_data_folder="/home/TDC-DS_BenchmarkProject/data"
+definiton_q_folder="/home/TDC-DS_BenchmarkProject/queries"
 
 def print_menu():
     print("[1] Generate the data.")
@@ -23,11 +24,23 @@ def o1_generatedata():
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
-    os.system("./dsdgen -scale "+ str(scale)+ "-dir "+definiton_data_folder+" -sufffix .csv")
     print(" ")
     print("Complete: Data generation")
     
-
+def o1_generatequeries():
+    print(" ")
+    print("Generate the queries")
+    scale = float(input('[PARAMS] Enter the scale factor: '))
+    
+    print(" ")
+    os.chdir("/tpcds-kit/tools")
+    os.system("./dsqgen -scale "+ str(scale)+ "-dir "+definiton_q_folder)
+    # DELIMITER =  <s>         -- use <s> as output field separator |
+    # SUFFIX =  <s>            -- use <s> as output file suffix
+    # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
+    # FORCE =  [Y|N]           -- over-write data files without prompting
+    print(" ")
+    print("Complete: Queries generation")
     
 def convert_dattocsv():
     os.chdir(definiton_data_folder)
