@@ -34,7 +34,7 @@ def o1_generatequeries():
     
     print(" ")
     os.chdir("/tpcds-kit/tools")
-    os.system("./dsqgen -scale "+ str(scale)+ "-dir "+definiton_q_folder)
+    os.system("./dsqgen -DIRECTORY ../query_templates -INPUT ../query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ "-DIALECT ../query_templates/sparksql -OUTPUT_DIR "+definiton_q_folder)
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
