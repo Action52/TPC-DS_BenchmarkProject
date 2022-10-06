@@ -31,18 +31,19 @@ RUN make OS=LINUX
 # B) GENERATE THE DATA
 RUN yum install -y nano
 RUN yum install -y python3
-WORKDIR home
-RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
-WORKDIR home/TDC-DS_BenchmarkProject
-RUN git fetch && git checkout isa
-WORKDIR home/TDC-DS_BenchmarkProject/script
-COPY ../../script/sparksql.tpl tpcds-kit/query_templates
-#RUN python3 app_menu.py
+RUN pip3 install pyspark
+WORKDIR /home/
+WORKDIR .
+COPY sparksql.tpl tpcds-kit/query_templates/
+COPY app_menu.py .
+#RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
+# WORKDIR TDC-DS_BenchmarkProject
+### RUN git fetch && git checkout isa
+# RUN python3 script/app_menu.py
 # C) INGEST THE DATA
 # D) CREATE THE QUERIES
 # E) EXECUTE THE QUERIES
     # E.1) INDIVIDUALLY
     # E.2) IN GROUP
 # F) RETRIEVE TPC RESULTS
-
-CMD "/bin/bash"
+CMD ["python3", "app_menu.py"]
