@@ -8,4 +8,4 @@ create table customer_demographics_tmp (
 ) using csv options(header "false", delimiter "|", path "${path}/${name}");
 drop table if exists customer_demographics;
 create table customer_demographics using parquet as (select * from customer_demographics_tmp);
-drop table table if exists customer_demographics_tmp;
+drop table if exists customer_demographics_tmp;

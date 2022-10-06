@@ -31,7 +31,7 @@ create table call_center_tmp (
   cc_country string, 
   cc_gmt_offset decimal(5, 2), 
   cc_tax_percentage decimal(5, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${na me}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}");
 drop table if  exists call_center;
-create table call_center using parquet as (select * call_center_tmp);
+create table call_center using parquet as (select * from call_center_tmp);
 drop table if exists call_center_tmp;

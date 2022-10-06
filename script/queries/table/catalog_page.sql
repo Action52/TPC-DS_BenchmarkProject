@@ -1,4 +1,4 @@
-drop table if exists catalog_page_tmp
+drop table if exists catalog_page_tmp;
 create table catalog_page_tmp (
   cp_catalog_page_sk integer, cp_catalog_page_id string, 
   cp_start_date_sk integer, cp_end_date_sk integer, 
