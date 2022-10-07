@@ -130,3 +130,6 @@ dmypy.json
 
 #spark
 data/
+script/spark-warehouse
+script/metastore_db
+script/derby.log
