@@ -10,11 +10,9 @@ spark = SparkSession.builder.appName("tpcds-loaddata-testing").enableHiveSupport
 relations = ["call_center", "catalog_page", "catalog_returns", "catalog_sales", 
              "customer_address", "customer_demographics", "customer", "date_dim",
              "dbgen_version", "household_demographics", "income_band", "inventory", "item", 
-             "promotion"]
-
-# TODO: add below comment to list
-# "reason", "ship_mode", "store_returns", "store_sales", "store", "time_dim", "warehouse", "web_page", "web_returns", "web_sales", "web_site"
-
+             "promotion", "reason", "ship_mode", "store_returns", "store_sales", "store",
+             "time_dim", "warehouse", "web_page", "web_returns", "web_sales", "web_site"
+            ]
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
