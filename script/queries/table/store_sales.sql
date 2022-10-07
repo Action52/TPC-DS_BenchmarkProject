@@ -1,5 +1,5 @@
-drop table if exists store_sales;
-create table store_sales (
+drop table if exists store_sales_tmp;
+create table store_sales_tmp (
   ss_sold_date_sk integer, 
   ss_sold_time_sk integer, 
   ss_item_sk integer, 
@@ -24,3 +24,6 @@ create table store_sales (
   ss_net_paid_inc_tax decimal(7, 2), 
   ss_net_profit decimal(7, 2)
 ) using csv options(header "false", delimiter "|", path "${path}/${name}");
+drop table if exists store_sales;
+create table store_sales using parquet as (select * from store_sales_tmp);
+drop table if exists store_sales_tmp;
