@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#spark
+data/
+script/spark-warehouse
+script/metastore_db
+script/derby.log
+
+.idea/*
