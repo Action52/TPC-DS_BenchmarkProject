@@ -36,6 +36,7 @@ WORKDIR /home/
 WORKDIR .
 COPY tpcds-image/sparksql.tpl /tpcds-kit/query_templates/
 COPY tpcds-image/app_menu.py .
+COPY tpcds-image/script/ .
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
 ### RUN git fetch && git checkout isa

@@ -16,8 +16,9 @@ relations = ["call_center", "catalog_page", "catalog_returns", "catalog_sales",
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-data_dir = "{}/../data".format(ROOT_DIR)
+data_dir = "/tmp/data/"  # "{}/../data".format(ROOT_DIR)
 sql_dir = "{}/queries/table/".format(ROOT_DIR)
+
 
 # Create database by reading from create_db file
 def createDatabase():
@@ -35,12 +36,14 @@ def importData():
         
         # Read queries file
         with open(filepath) as fr:
-            queries = fr.read().strip("\n").replace("${path}", data_dir).replace("${name}", relation).split(";");
+            queries = fr.read().strip("\n").replace("${path}", data_dir).replace("${name}", f"{relation}.dat").split(";");
         
         
         for query in queries:
+            print(query)
             if query != "":
                 spark.sql(query);
+
 
 createDatabase()
 importData()

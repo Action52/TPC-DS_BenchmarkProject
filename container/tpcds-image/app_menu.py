@@ -5,6 +5,7 @@ import csv
 definiton_data_folder = "/tmp/data/"
 definiton_q_folder = "/tmp/queries/"
 
+
 def print_menu():
     print("[1] Generate the data.")
     print("[2] Create schemas and load data.")
@@ -34,7 +35,7 @@ def o1_generatequeries():
     print(" ")
     print("Generate the queries")
     scale = float(input('[PARAMS] Enter the scale factor: '))
-    
+
     print(" ")
     os.chdir("/tpcds-kit/tools")
     os.system("./dsqgen -DIRECTORY ../query_templates -INPUT ../query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ "-DIALECT ../query_templates/sparksql -OUTPUT_DIR "+definiton_q_folder)
@@ -44,12 +45,17 @@ def o1_generatequeries():
     # FORCE =  [Y|N]           -- over-write data files without prompting
     print(" ")
     print(os.system("ls " + definiton_data_folder))
+    os.chdir("/home/")
     print("Complete: Queries generation")
 
 
 def o2_createschemas():
     print(" ")
     print("Create schemas")
+    print(os.chdir("/home/"))
+    os.system("python3 import_data.py")
+    print("Finished creating schemas and importing the data.")
+
 
 def o3_generatedata():
     print(" ")
@@ -69,7 +75,7 @@ while(True):
     elif option == 2:
         o2_createschemas()
     elif option == 3:
-        o3_generatedata()
+        o1_generatequeries()
     elif option == 4:
         print('Exit')
         exit()

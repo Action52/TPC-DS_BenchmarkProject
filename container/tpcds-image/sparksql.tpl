@@ -29,11 +29,13 @@
 --     OR OTHERWISE, ARISING IN ANY WAY OUT OF THIS OR ANY OTHER AGREEMENT 
 --     RELATING TO THE WORK, WHETHER OR NOT SUCH AUTHOR OR DEVELOPER HAD 
 --     ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 
--- 
+-- ls
 -- Contributors:
 -- 
 define __LIMITA = "";
 define __LIMITB = "";
 define __LIMITC = "limit %d";
 define _BEGIN = "-- start query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
-define _END = "-- end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
+define _END = ""
+
+--      end query " + [_QUERY] + " in stream " + [_STREAM] + " using template " + [_TEMPLATE];
