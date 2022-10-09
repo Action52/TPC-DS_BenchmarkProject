@@ -42,5 +42,6 @@ services:
       - ../data:/project
     depends_on:
       - spark-master
+      - spark-worker-a
 networks:
   spark_sql_network:
