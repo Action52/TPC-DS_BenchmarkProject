@@ -3,7 +3,7 @@ import csv
 
 # Print Options
 definiton_data_folder = "/tmp/data/"
-definiton_q_folder = "/tmp/queries/"
+definiton_q_folder = "/tmp/queries"
 
 
 def print_menu():
@@ -38,13 +38,12 @@ def o1_generatequeries():
 
     print(" ")
     os.chdir("/tpcds-kit/tools")
-    os.system("./dsqgen -DIRECTORY ../query_templates -INPUT ../query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ "-DIALECT ../query_templates/sparksql -OUTPUT_DIR "+definiton_q_folder)
+    os.system("./dsqgen -DIRECTORY /tpcds-kit/query_templates -INPUT /tpcds-kit/query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ " -DIALECT sparksql -OUTPUT_DIR "+definiton_q_folder)
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
     print(" ")
-    print(os.system("ls " + definiton_data_folder))
     os.chdir("/home/")
     print("Complete: Queries generation")
 
