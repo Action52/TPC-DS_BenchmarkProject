@@ -1,4 +1,4 @@
-import os
+import os, shutil
 import csv
 
 # Print Options
@@ -20,7 +20,7 @@ def o1_generatedata():
     
     print(" ")
     try:
-        os.mkdir("/tmp/data")
+        os.mkdir(definiton_data_folder)
     except:
         print('File exist.')
     os.chdir("/tpcds-kit/tools")
@@ -29,6 +29,12 @@ def o1_generatedata():
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
+    dir_name=definiton_data_folder
+    files= os.listdir(definiton_data_folder)
+    for i in files:
+        os.mkdir(os.path.join(dir_name , i.split(".")[0]))
+        shutil.move(os.path.join(dir_name , i), os.path.join(dir_name , i.split(".")[0]))
+
     print(" ")
     print("Complete: Data generation")
 
@@ -38,7 +44,7 @@ def o1_generatequeries():
     print("Generate the queries")
     
     try:
-        os.mkdir("/tmp/queries")
+        os.mkdir(definiton_q_folder)
     except:
         print('File exist.')
     scale = float(input('[PARAMS] Enter the scale factor: '))
@@ -50,6 +56,7 @@ def o1_generatequeries():
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
+    
     print(" ")
     os.chdir("/home/")
     print("Complete: Queries generation")
