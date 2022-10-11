@@ -1,9 +1,10 @@
-import os
+import os, shutil
 import csv
 
 # Print Options
-definiton_data_folder = "/tmp/data/"
-definiton_q_folder = "/tmp/queries/"
+definiton_data_folder = "/tmp/data"
+definiton_q_folder = "/tmp/queries"
+
 
 def print_menu():
     print("[1] Generate the data.")
@@ -18,14 +19,22 @@ def o1_generatedata():
     scale = float(input('[PARAMS] Enter the scale factor: '))
     
     print(" ")
-    os.mkdir("/tmp/data")
-    os.mkdir("/tmp/queries")
+    try:
+        os.mkdir(definiton_data_folder)
+    except:
+        print('File exist.')
     os.chdir("/tpcds-kit/tools")
     os.system("./dsdgen -SCALE "+ str(scale) + " -DIR "+definiton_data_folder)
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
+    dir_name=definiton_data_folder
+    files= os.listdir(definiton_data_folder)
+    for i in files:
+        os.mkdir(os.path.join(dir_name , i.split(".")[0]))
+        shutil.move(os.path.join(dir_name , i), os.path.join(dir_name , i.split(".")[0]))
+
     print(" ")
     print("Complete: Data generation")
 
@@ -33,46 +42,33 @@ def o1_generatedata():
 def o1_generatequeries():
     print(" ")
     print("Generate the queries")
-    scale = float(input('[PARAMS] Enter the scale factor: '))
     
+    try:
+        os.mkdir(definiton_q_folder)
+    except:
+        print('File exist.')
+    scale = float(input('[PARAMS] Enter the scale factor: '))
+
     print(" ")
     os.chdir("/tpcds-kit/tools")
-    os.system("./dsqgen -scale "+ str(scale)+ "-dir "+definiton_q_folder)
+    os.system("./dsqgen -DIRECTORY /tpcds-kit/query_templates -INPUT /tpcds-kit/query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ " -DIALECT sparksql -OUTPUT_DIR "+definiton_q_folder)
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
-    print(" ")
-    print(os.system("ls " + definiton_data_folder))
-    print("Complete: Queries generation")
     
-def convert_dattocsv():
-    os.chdir(definiton_data_folder)
-    os.system("mkdir data_csv")
-    base_folder_csv="/tmp/data_csv/"
-
-    dir_path ="/tmp"
-
-    print("Running...")
-    # Iterate directory
-    for path in os.listdir(dir_path):
-        # check if current path is a file
-        if os.path.isfile(os.path.join(dir_path, path)):
-            name=path.split(".")[0]
-            print("Processing: "+ path)
-            if(path.endswith(".dat")):
-                with open(path) as dat_file, open(base_folder_csv+name+'.csv', 'w') as csv_file:
-                    csv_writer = csv.writer(csv_file)
-
-                    for line in dat_file:
-                        row = [field.strip() for field in line.split('|')]
-                        csv_writer.writerow(row)
-                print("Complete: " + path)
+    print(" ")
+    os.chdir("/home/")
+    print("Complete: Queries generation")
 
 
 def o2_createschemas():
     print(" ")
     print("Create schemas")
+    print(os.chdir("/home/"))
+    os.system("python3 import_data.py")
+    print("Finished creating schemas and importing the data.")
+
 
 def o3_generatedata():
     print(" ")
@@ -92,7 +88,7 @@ while(True):
     elif option == 2:
         o2_createschemas()
     elif option == 3:
-        o3_generatedata()
+        o1_generatequeries()
     elif option == 4:
         print('Exit')
         exit()

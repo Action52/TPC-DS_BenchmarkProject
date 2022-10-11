@@ -22,7 +22,7 @@ RUN tar -xzf spark-3.3.0-bin-hadoop3.tgz && \
     rm spark-3.3.0-bin-hadoop3.tgz
 # Download the tpcds tools / Maybe change for local COPY only.
 RUN git clone https://github.com/databricks/tpcds-kit.git
-WORKDIR tpcds-kit/tools
+WORKDIR /tpcds-kit/tools
 # Run the makefile
 RUN make OS=LINUX
 # TODO: AT THE END THE CONTAINER SHOULD POINT THE USER TO A
@@ -32,9 +32,9 @@ RUN make OS=LINUX
 RUN yum install -y nano
 RUN yum install -y python3
 RUN pip3 install pyspark
-WORKDIR /home/
-WORKDIR .
-COPY app_menu.py .
+WORKDIR /home
+COPY tpcds-image/* .
+COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
 ### RUN git fetch && git checkout isa
@@ -45,4 +45,4 @@ COPY app_menu.py .
     # E.1) INDIVIDUALLY
     # E.2) IN GROUP
 # F) RETRIEVE TPC RESULTS
-CMD ["python3", "app_menu.py"]
+# CMD ["python3", "app_menu.py"]
