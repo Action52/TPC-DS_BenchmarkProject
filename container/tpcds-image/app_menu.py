@@ -19,8 +19,10 @@ def o1_generatedata():
     scale = float(input('[PARAMS] Enter the scale factor: '))
     
     print(" ")
-    os.mkdir("/tmp/data")
-    os.mkdir("/tmp/queries")
+    try:
+        os.mkdir("/tmp/data")
+    except:
+        print('File exist.')
     os.chdir("/tpcds-kit/tools")
     os.system("./dsdgen -SCALE "+ str(scale) + " -DIR "+definiton_data_folder)
     # DELIMITER =  <s>         -- use <s> as output field separator |
@@ -34,6 +36,11 @@ def o1_generatedata():
 def o1_generatequeries():
     print(" ")
     print("Generate the queries")
+    
+    try:
+        os.mkdir("/tmp/queries")
+    except:
+        print('File exist.')
     scale = float(input('[PARAMS] Enter the scale factor: '))
 
     print(" ")

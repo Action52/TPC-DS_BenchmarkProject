@@ -34,7 +34,7 @@ RUN yum install -y python3
 RUN pip3 install pyspark
 WORKDIR /home
 COPY tpcds-image/* .
-COPY tpcds-image/sparksql.tpl /tpcds-kit/query_templates
+COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
 ### RUN git fetch && git checkout isa
