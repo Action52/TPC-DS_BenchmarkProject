@@ -2,7 +2,7 @@ import os, shutil
 import csv
 
 # Print Options
-definiton_data_folder = "/tmp/data/"
+definiton_data_folder = "/tmp/data"
 definiton_q_folder = "/tmp/queries"
 
 
