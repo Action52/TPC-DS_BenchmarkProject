@@ -5,7 +5,10 @@ from pyspark import SparkContext
 from pyspark.sql import SQLContext, SparkSession
 
 # Initiate Spark
-spark = SparkSession.builder.appName("tpcds-loaddata-testing").enableHiveSupport().getOrCreate();
+spark = SparkSession.builder.appName("tpcds-loaddata-testing")\
+    .master("spark://spark-master:7077")\
+    .enableHiveSupport()\
+    .getOrCreate()
 
 relations = ["call_center", "catalog_page", "catalog_returns", "catalog_sales", 
              "customer_address", "customer_demographics", "customer", "date_dim",
@@ -16,8 +19,9 @@ relations = ["call_center", "catalog_page", "catalog_returns", "catalog_sales",
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-data_dir = "/tmp/data/"
-sql_dir = "{}/queries/table/".format(ROOT_DIR)
+data_dir = "/shared_tpcds_folder/data/"
+sql_dir = "/shared_tpcds_folder/queries/table/"
+# sql_dir = "{}/queries/table/".format(ROOT_DIR)
 
 
 # Create database by reading from create_db file
@@ -38,7 +42,6 @@ def importData():
         with open(filepath) as fr:
             datafile_dir = data_dir + relation
             queries = fr.read().strip("\n").replace("${path}", datafile_dir).replace("${name}", f"{relation}.dat").split(";");
-        
         
         for query in queries:
             if query != "":
