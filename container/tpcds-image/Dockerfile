@@ -32,8 +32,9 @@ RUN make OS=LINUX
 RUN yum install -y nano
 RUN yum install -y python3
 RUN pip3 install pyspark
+RUN pip3 install tqdm
 WORKDIR /home
-COPY tpcds-image/* .
+#COPY tpcds-image/* .
 COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
@@ -45,4 +46,4 @@ COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
     # E.1) INDIVIDUALLY
     # E.2) IN GROUP
 # F) RETRIEVE TPC RESULTS
-# CMD ["python3", "app_menu.py"]
+CMD ["/bin/bash"]
