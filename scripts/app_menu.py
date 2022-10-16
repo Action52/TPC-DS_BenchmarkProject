@@ -2,8 +2,8 @@ import os, shutil
 import csv
 
 # Print Options
-definiton_data_folder = "/tmp/data"
-definiton_q_folder = "/tmp/queries"
+definiton_data_folder = "/shared_tpcds_folder/data"
+definiton_q_folder = "/shared_tpcds_folder/queries"
 
 
 def print_menu():
