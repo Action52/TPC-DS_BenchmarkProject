@@ -19,7 +19,7 @@ create table promotion_tmp (
   p_channel_details string, 
   p_purpose string, 
   p_discount_active string
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists promotion;
-create table promotion using parquet as (select * from promotion_tmp);
+create table promotion using parquet location '${path}/${name}/parquet' as (select * from promotion_tmp);
 drop table if exists promotion_tmp;

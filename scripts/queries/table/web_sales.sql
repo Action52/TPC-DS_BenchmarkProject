@@ -34,7 +34,7 @@ create table web_sales_tmp (
     ws_net_paid_inc_ship      double,
     ws_net_paid_inc_ship_tax  double,
     ws_net_profit             double
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists web_sales;
-create table web_sales using parquet as (select * from web_sales_tmp);
+create table web_sales using parquet location '${path}/${name}/parquet' as (select * from web_sales_tmp);
 drop table web_sales_tmp;

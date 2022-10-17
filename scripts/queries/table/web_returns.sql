@@ -24,7 +24,7 @@ create table web_returns_tmp (
     wr_reversed_charge        double,
     wr_account_credit         double,
     wr_net_loss               double
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists web_returns;
-create table web_returns using parquet as (select * from web_returns_tmp);
+create table web_returns using parquet location '${path}/${name}/parquet' as (select * from web_returns_tmp);
 drop table if exists web_returns_tmp;

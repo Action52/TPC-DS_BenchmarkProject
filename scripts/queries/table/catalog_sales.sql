@@ -34,7 +34,7 @@ create table catalog_sales_tmp (
   cs_net_paid_inc_ship decimal(7, 2), 
   cs_net_paid_inc_ship_tax decimal(7, 2), 
   cs_net_profit decimal(7, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists catalog_sales;
-create table catalog_sales using parquet as (select * from catalog_sales_tmp);
+create table catalog_sales using parquet location '${path}/${name}/parquet' as (select * from catalog_sales_tmp);
 drop table if exists catalog_sales_tmp;

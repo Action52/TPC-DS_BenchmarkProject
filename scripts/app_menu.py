@@ -2,15 +2,16 @@ import os, shutil
 import csv
 
 # Print Options
-definiton_data_folder = "/shared_tpcds_folder/data"
-definiton_q_folder = "/shared_tpcds_folder/queries"
-
+definiton_data_folder = "/data_vol_shared"
+definiton_q_folder = "/queries_vol_shared"
+scripts_path = "/scripts/"
 
 def print_menu():
     print("[1] Generate the data.")
     print("[2] Create schemas and load data.")
     print("[3] Run queries.")
     print("[4] Exit.")
+
 
 # Definitons of functions
 def o1_generatedata():
@@ -24,16 +25,19 @@ def o1_generatedata():
     except:
         print('File exist.')
     os.chdir("/tpcds-kit/tools")
-    os.system("./dsdgen -SCALE "+ str(scale) + " -DIR "+definiton_data_folder)
+    os.system(f"./dsdgen -SCALE {str(scale)} -DIR {definiton_data_folder}")
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
     # FORCE =  [Y|N]           -- over-write data files without prompting
-    dir_name=definiton_data_folder
-    files= os.listdir(definiton_data_folder)
+    dir_name = definiton_data_folder
+    files = os.listdir(definiton_data_folder)
     for i in files:
-        os.mkdir(os.path.join(dir_name , i.split(".")[0]))
-        shutil.move(os.path.join(dir_name , i), os.path.join(dir_name , i.split(".")[0]))
+        try:
+            os.mkdir(os.path.join(dir_name, i.split(".")[0]))
+            shutil.move(os.path.join(dir_name, i), os.path.join(dir_name , i.split(".")[0]))
+        except:
+            print("Folder or file exists. Remove them first.")
 
     print(" ")
     print("Complete: Data generation")
@@ -51,7 +55,16 @@ def o1_generatequeries():
 
     print(" ")
     os.chdir("/tpcds-kit/tools")
-    os.system("./dsqgen -DIRECTORY /tpcds-kit/query_templates -INPUT /tpcds-kit/query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE "+ str(scale)+ " -DIALECT sparksql -OUTPUT_DIR "+definiton_q_folder)
+    os.system(f"""
+        ./dsqgen \
+            -DIRECTORY /tpcds-kit/query_templates \
+            -INPUT /tpcds-kit/query_templates/templates.lst \
+            -VERBOSE Y \
+            -QUALIFY Y \
+            -SCALE {str(scale)} \
+            -DIALECT sparksql \
+            -OUTPUT_DIR {definiton_q_folder}
+    """)
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
@@ -65,8 +78,7 @@ def o1_generatequeries():
 def o2_createschemas():
     print(" ")
     print("Create schemas")
-    print(os.chdir("/home/"))
-    os.system("python3 import_data.py")
+    os.system(f"python3 {scripts_path}import_data.py")
     print("Finished creating schemas and importing the data.")
 
 

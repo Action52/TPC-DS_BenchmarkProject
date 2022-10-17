@@ -13,7 +13,7 @@ create table customer_address_tmp (
   ca_country string, 
   ca_gmt_offset decimal(5, 2), 
   ca_location_type string
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists customer_address;
-create table customer_address using parquet as (select * from customer_address_tmp);
+create table customer_address using parquet location '${path}/${name}/parquet' as (select * from customer_address_tmp);
 drop table if exists customer_address_tmp;
