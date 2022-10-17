@@ -28,7 +28,7 @@ tables = ["call_center", "catalog_page", "catalog_returns", "catalog_sales",
             ]
 
 data_size = "1GB"  # 2GB 4GB
-s3_bucket = "s3://tpcds-spark/"
+s3_bucket = "s3n://tpcds-spark/"
 db_name = "tpcds"
 schemas_location = "scripts/queries/table/"
 
@@ -36,11 +36,24 @@ schemas_location = "scripts/queries/table/"
 
 # Create database and tables
 def create_database(name=db_name):
-    spark.sql(f"DROP DATABASE IF EXISTS {name}")
+    spark.sql(f"DROP DATABASE IF EXISTS {name} CASCADE")
     spark.sql(f"CREATE DATABASE {name}")
     spark.sql(f"USE {name}")
+def create_table(relation, s3_bucket=s3_bucket, db_name=db_name, schemas_location=schemas_location, data_size=data_size, spark=spark):
+    spark.sql(f"USE {db_name}")
+    schema_path = f"{schemas_location}{relation}.sql"
+    data_path = f"{s3_bucket}{data_size}/{relation}/{relation}/parquet/"
+    with open(schema_path) as schema_file:
+        print(data_path)
+        query = schema_file.read().strip("\n").replace("${data_path}", data_path)
+        spark.sql(f"DROP TABLE IF EXISTS {relation}")
+        spark.sql(query)
     
-def create_table(db, schema, ):
+create_database()
+create_table(relation="call_center")
+
+spark.sql("SHOW DATABASES").show()
+spark.sql("SELECT * FROM call_center LIMIT 5").show()
 
 # COMMAND ----------
 
