@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "log4j.rootCategory=INFO, console" >> /spark/conf/log4j.properties
+
 if [ 'master' == $1 ]; then :
   echo "Building Master Node." 
   /spark/bin/spark-class org.apache.spark.deploy.master.Master --ip `hostname` --port 7077 --webui-port 8080; else :
