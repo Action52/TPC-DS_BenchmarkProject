@@ -20,7 +20,7 @@ create table store_returns_tmp (
   sr_reversed_charge decimal(7, 2), 
   sr_store_credit decimal(7, 2), 
   sr_net_loss decimal(7, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists store_returns;
-create table store_returns using parquet as (select * from store_returns_tmp);
+create table store_returns using parquet location '${path}/${name}/parquet' as (select * from store_returns_tmp);
 drop table if exists store_returns_tmp;

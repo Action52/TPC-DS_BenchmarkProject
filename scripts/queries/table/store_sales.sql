@@ -23,7 +23,7 @@ create table store_sales_tmp (
   ss_net_paid decimal(7, 2), 
   ss_net_paid_inc_tax decimal(7, 2), 
   ss_net_profit decimal(7, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists store_sales;
-create table store_sales using parquet as (select * from store_sales_tmp);
+create table store_sales using parquet location '${path}/${name}/parquet' as (select * from store_sales_tmp);
 drop table if exists store_sales_tmp;

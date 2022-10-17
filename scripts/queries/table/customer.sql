@@ -9,7 +9,7 @@ create table customer_tmp (
   c_birth_month integer, c_birth_year integer, 
   c_birth_country string, c_login string, 
   c_email_address string, c_last_review_date_sk integer
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists customer;
-create table customer using parquet as (select * from customer_tmp);
+create table customer using parquet location '${path}/${name}/parquet' as (select * from customer_tmp);
 drop table if exists customer_tmp;

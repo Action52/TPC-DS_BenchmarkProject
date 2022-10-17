@@ -1,13 +1,22 @@
 """
-This script parses the queries sql file, transforms them into pyspark format, and returns a .txt file that
-will then be used as input to run the queries.
+This scripts parses the queries sql file, transforms them into pyspark format, and executes them.
 """
 from pyspark.sql import SparkSession
 from argparse import ArgumentParser
-
+from tqdm import tqdm
+import time
+import os
 
 def create_spark_session():
-    return SparkSession.builder.master("spark://spark-master:7077").appName("tpcds").getOrCreate()
+    # Initiate Spark
+    spark = SparkSession.builder.appName("tpcds-loadqueries-testing") \
+        .master("spark://spark-master:7077") \
+        .config("spark.hadoop.hive.insert.into.external.tables", True)\
+        .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", True)\
+        .enableHiveSupport() \
+        .getOrCreate()
+    spark.sparkContext.setLogLevel('ERROR')
+    return spark
 
 
 def parse_args():
@@ -16,8 +25,11 @@ def parse_args():
     :return:
     """
     parser = ArgumentParser()
-    parser.add_argument("-q", "--queries-file-path")
-    parser.add_argument("-o", "--output-file-path")
+    parser.add_argument("-q", "--queries-file-path", default="/queries_vol_shared/query_0.sql")
+    parser.add_argument("-o", "--output-file-path", default="/queries_vol_shared/all.sql")
+    choices = [i for i in range(99)]
+    parser.add_argument("-r", "--query-to-run", default=-1, choices=choices, type=int,
+                        help="Query to run. To run all select -1, which is default")
     args = parser.parse_args()
     return args
 
@@ -31,6 +43,7 @@ def parse_file(file_obj) -> list:
     comment_count = 0
     queries = []
     query_lines = []
+    pbar = tqdm(total=99)
     for line in file_obj:
         if comment_count == 0 and "--" in line:  # it is a comment and therefore the beginning or end of a query
             comment_count += 1
@@ -41,8 +54,70 @@ def parse_file(file_obj) -> list:
         elif comment_count == 1 and "--" in line:  # it is the second comment indicating this is the end of the query
             query = "".join(query_lines)
             queries.append(query)
+            pbar.update(1)
             comment_count = 0
+    pbar.close()
     return queries
+
+
+def run_queries(query_number=-1,
+                queries_new=[],
+                path_to_output="/queries_vol_shared/query_results/",
+                statistics_output = "/queries_vol_shared/statistics.csv"
+                ):
+    """
+    :param query_number: -1 to run all. If not, provide query number.
+    :param queries_new: List of query strings.
+    :return:
+    """
+    spark = create_spark_session()
+    spark.sql("USE tpcds")
+    skip_queries = []
+    statistics = []
+    try:
+        os.mkdir(path_to_output)
+    except:
+        print("Directory exists.")
+    if query_number == -1:  # Run all
+        print("Running all queries.")
+        for i, query in tqdm(enumerate(queries_new)):
+            try:
+                start_time = time.time()
+                result = spark.sql(query)
+                row_cnt = result.count()
+                result.write.mode("overwrite").option("header", True) \
+                    .option("delimiter", "|") \
+                    .csv(f"{path_to_output}query_{i}")
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                statistics.append(
+                    {"query": f"Query {i}", "elapsed_time": elapsed_time, "rows": row_cnt}
+                )
+            except Exception as e:
+                print(f"Query {i + 1} failed.")
+                print(e)
+                skip_queries.append(i + 1)
+        print(skip_queries)
+        return statistics
+    else:  # Run only one query
+        print(f"Running query {query_number}...")
+        query = queries_new[query_number - 1]
+        try:
+            start_time = time.time()
+            result = spark.sql(query)
+            row_cnt = result.count()
+            result.write.mode("overwrite").option("header", True) \
+                .option("delimiter", "|") \
+                .csv(f"{path_to_output}query_{query_number}")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            statistics.append(
+                {"query": f"Query {query_number}", "elapsed_time": elapsed_time, "rows": row_cnt}
+            )
+        except:
+            print(f"Query {query_number} failed.")
+        print("Done.")
+        return statistics
 
 
 def main():
@@ -51,16 +126,12 @@ def main():
     :return:
     """
     args = parse_args()
-    print("running")
+    print(f"Processing queries from .sql file. ({args.queries_file_path})")
     with open(args.queries_file_path, "r") as queries_file_old:
-        with open(args.output_file_path, "w") as queries_file_new:
-            queries_new = parse_file(queries_file_old)
-            print(len(queries_new))
+        queries_new = parse_file(queries_file_old)
 
-    # Now do spark things
-    spark = create_spark_session()
-    spark.sql("use tpcds;")
-    spark.sql("SELECT * FROM web_sales LIMIT 5;");
+    results = run_queries(args.query_to_run, queries_new)
+    print(results)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ create table date_dim_tmp (
   d_same_day_lq integer, d_current_day string, 
   d_current_week string, d_current_month string, 
   d_current_quarter string, d_current_year string
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists date_dim;
-create table date_dim using parquet as (select * from date_dim_tmp);
+create table date_dim using parquet location '${path}/${name}/parquet' as (select * from date_dim_tmp);
 drop table if exists date_dim_tmp;

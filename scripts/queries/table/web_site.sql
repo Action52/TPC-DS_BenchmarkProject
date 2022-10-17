@@ -26,7 +26,7 @@ create table web_site_tmp(
     web_country               string,
     web_gmt_offset            double,
     web_tax_percentage        double
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists web_site;
-create table web_site using parquet as (select * from web_site_tmp);
+create table web_site using parquet location '${path}/${name}/parquet' as (select * from web_site_tmp);
 drop table if exists web_site_tmp;

@@ -14,7 +14,7 @@ create table warehouse_tmp (
   w_zip string, 
   w_country string, 
   w_gmt_offset decimal(5, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists warehouse;
-create table warehouse using parquet as (select * from warehouse_tmp);
+create table warehouse using parquet location '${path}/${name}/parquet' as (select * from warehouse_tmp);
 drop table warehouse_tmp;

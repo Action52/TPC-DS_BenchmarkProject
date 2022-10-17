@@ -5,7 +5,7 @@ create table time_dim_tmp (
   t_second integer, t_am_pm string, 
   t_shift string, t_sub_shift string, 
   t_meal_time string
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists time_dim;
-create table time_dim using parquet as (select * from time_dim_tmp);
+create table time_dim using parquet location '${path}/${name}/parquet' as (select * from time_dim_tmp);
 drop table if exists time_dim_tmp;

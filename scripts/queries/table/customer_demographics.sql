@@ -5,7 +5,7 @@ create table customer_demographics_tmp (
   cd_purchase_estimate integer, cd_credit_rating string, 
   cd_dep_count integer, cd_dep_employed_count integer, 
   cd_dep_college_count integer
-) using csv options(header "false", delimiter "|", path "${path}/${name}");
+) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
 drop table if exists customer_demographics;
-create table customer_demographics using parquet as (select * from customer_demographics_tmp);
+create table customer_demographics using parquet location '${path}/${name}/parquet' as (select * from customer_demographics_tmp);
 drop table if exists customer_demographics_tmp;
