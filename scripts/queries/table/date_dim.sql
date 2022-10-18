@@ -1,5 +1,5 @@
-drop table if exists date_dim_tmp;
-create table date_dim_tmp (
+drop table if exists date_dim;
+create table date_dim (
   d_date_sk integer, d_date_id string, 
   d_date date, d_month_seq integer, 
   d_week_seq integer, d_quarter_seq integer, 
@@ -13,7 +13,4 @@ create table date_dim_tmp (
   d_same_day_lq integer, d_current_day string, 
   d_current_week string, d_current_month string, 
   d_current_quarter string, d_current_year string
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists date_dim;
-create table date_dim using parquet location '${path}/${name}/parquet' as (select * from date_dim_tmp);
-drop table if exists date_dim_tmp;
+) using parquet options ( path "${data_path}" )

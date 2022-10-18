@@ -1,5 +1,5 @@
-drop table if exists item_tmp;
-create table item_tmp (
+drop table if exists item;
+create table item (
   i_item_sk integer, 
   i_item_id string, 
   i_rec_start_date date, 
@@ -22,7 +22,4 @@ create table item_tmp (
   i_container string, 
   i_manager_id integer, 
   i_product_name string
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists item;
-create table item using parquet location '${path}/${name}/parquet' as (select * from item_tmp);
-drop table if exists item_tmp;
+) using parquet options ( path "${data_path}" )
