@@ -8,6 +8,7 @@
 # COMMAND ----------
 
 # MAGIC %pip install tqdm
+# MAGIC %pip install joblib
 
 # COMMAND ----------
 
@@ -52,7 +53,6 @@ def create_database(name=db_name):
 def create_table(relation, s3_bucket=s3_bucket, db_name=db_name, schemas_location=schemas_location, data_size=data_size, spark=spark):
     spark.sql(f"USE {db_name}")
     schema_path = f"{schemas_location}{relation}.sql"
-    #data_path = f"{s3_bucket}raw/{data_size}/{relation}/{relation}.dat"
     data_path = f"{s3_bucket}{data_size}/{relation}/{relation}/parquet/"
     with open(schema_path) as schema_file:
         queries = schema_file.read().strip("\n").replace("${data_path}", data_path).split(";")
@@ -89,6 +89,10 @@ def save_list_results(url, data):
 
 # COMMAND ----------
 
+from joblib import Parallel, delayed
+
+NUM_THREADS = 5
+
 def load_queries(path_to_queries) -> list:
     with open(path_to_queries) as file_obj:
         comment_count = 0
@@ -108,43 +112,56 @@ def load_queries(path_to_queries) -> list:
     return queries
 
 def run_query(run_id, query_number, queries, path_to_save_results, print_result=False):
-    start = time.time()
-    result = spark.sql(queries[query_number-1])
-    count = result.count()
-    end = time.time()
-    result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results)
-    stats = {
-        "run_id": run_id,
-        "query_id": query_number,
-        "start_time": start,
-        "end_time": end,
-        "elapsed_time": end-start,
-        "result": result,
-        "row_count": count
-    }
-    if (print_result is True):
-        print(stats)
-        print(result.show())
-    return stats
+    try:
+        start = time.time()
+        result = spark.sql(queries[query_number-1])
+        count = result.count()
+        end = time.time()
+        result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results)
+        stats = {
+            "run_id": run_id,
+            "query_id": query_number,
+            "start_time": start,
+            "end_time": end,
+            "elapsed_time": end-start,
+            "result": result.show(),
+            "row_count": count
+        }
+        if (print_result is True):
+            print(stats)
+            print(result.show())
+        return stats
+    except:
+        return {}
 
 def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
-    results = []
-    for i, query in enumerate(queries):
-        results.append(run_query(run_id, query_number=i, queries=queries, path_to_save_results=path_to_save_results))
+    results = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, True) for i in range(len(queries)))
+    print(results)
     save_list_results(path_to_save_stats, results)
 
+# COMMAND ----------
 
-queries = load_queries("scripts/queries_1G.sql")
-run_query(1, 1, queries, "s3://tpcds-spark/results/1G/test_run_csv", print_result=True)
-run_queries(1, queries, "s3://tpcds-spark/results/1G/test_run_csv","s3://tpcds-spark/results/1G/test_stats_csv" )
+# queries = load_queries("scripts/queries_1G.sql")
+# # # run_query(1, 5, queries, "s3://tpcds-spark/results/1G/test_run_csv", print_result=True)
+# run_queries(1, queries, "s3://tpcds-spark/results/1G/test_run_csv", "s3://tpcds-spark/stats/1G/test_run_stats_csv")
+
+def run_test():
+    # Run all the dataset from 1G, 2G, and 3G
+    data_sizes = ["1G", "2G", "4G"]
+    
+    for i, data_size in enumerate(data_sizes):
+        queries_path = "scripts/queries_{size}.sql".format(size=data_size)
+        result_path = "s3://tpcds-spark/results/{size}/test_run_csv".format(size=data_size)
+        stats_path = "s3://tpcds-spark/stats/{size}/test_run_stats_csv".format(size=data_size)
+        
+        queries = load_queries(queries_path)
+        
+        run_queries(i+1, queries, result_path, stats_path)
+
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
-dfdsfasdfadsf
+len([5, 12, 14, 16, 20, 21, 23, 24, 32, 37, 39, 40, 50, 62, 64, 77, 80, 82, 92, 94, 95, 98, 99])
 
 # COMMAND ----------
 
