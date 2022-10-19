@@ -78,6 +78,17 @@ create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
 
 # COMMAND ----------
 
+import csv
+
+def save_list_results(url, data):
+    with open(url,"w",newline="") as f:  
+        title = "run_id,query_id,start_time,end_time,elapsed_time,result,row_count".split(",") 
+        cw = csv.DictWriter(f,title,delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        cw.writeheader()
+        cw.writerows(data)
+
+# COMMAND ----------
+
 def load_queries(path_to_queries) -> list:
     with open(path_to_queries) as file_obj:
         comment_count = 0
@@ -104,6 +115,7 @@ def run_query(run_id, query_number, queries, path_to_save_results, print_result=
     result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results)
     stats = {
         "run_id": run_id,
+        "query_id": query_number,
         "start_time": start,
         "end_time": end,
         "elapsed_time": end-start,
@@ -119,10 +131,20 @@ def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
     results = []
     for i, query in enumerate(queries):
         results.append(run_query(run_id, query_number=i, queries=queries, path_to_save_results=path_to_save_results))
+    save_list_results(path_to_save_stats, results)
 
 
 queries = load_queries("scripts/queries_1G.sql")
 run_query(1, 1, queries, "s3://tpcds-spark/results/1G/test_run_csv", print_result=True)
+run_queries(1, queries, "s3://tpcds-spark/results/1G/test_run_csv","s3://tpcds-spark/results/1G/test_stats_csv" )
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+dfdsfasdfadsf
 
 # COMMAND ----------
 
