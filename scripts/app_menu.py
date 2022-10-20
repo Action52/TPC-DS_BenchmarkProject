@@ -56,6 +56,9 @@ def o1_generatequeries():
     print(" ")
     os.chdir("/tpcds-kit/tools")
     os.system(f"""
+        ls {scripts_path}query_templates 
+    """)
+    os.system(f"""
         ./dsqgen \
             -DIRECTORY {scripts_path}query_templates \
             -INPUT {scripts_path}query_templates/templates.lst \
