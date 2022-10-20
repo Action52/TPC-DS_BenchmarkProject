@@ -55,16 +55,7 @@ def o1_generatequeries():
 
     print(" ")
     os.chdir("/tpcds-kit/tools")
-    os.system(f"""
-        ./dsqgen \
-            -DIRECTORY /tpcds-kit/query_templates \
-            -INPUT /tpcds-kit/query_templates/templates.lst \
-            -VERBOSE Y \
-            -QUALIFY Y \
-            -SCALE {str(scale)} \
-            -DIALECT sparksql \
-            -OUTPUT_DIR {definiton_q_folder}
-    """)
+    os.system(f"""./dsqgen  -DIRECTORY /tpcds-kit/query_templates  -INPUT /tpcds-kit/query_templates/templates.lst  -VERBOSE Y -QUALIFY Y  -SCALE {str(scale)} -DIALECT sparksql  -OUTPUT_DIR {definiton_q_folder}""")
     # DELIMITER =  <s>         -- use <s> as output field separator |
     # SUFFIX =  <s>            -- use <s> as output file suffix
     # TERMINATE =  [Y|N]       -- end each record with a field delimiter |
