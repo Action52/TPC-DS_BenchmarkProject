@@ -81,11 +81,8 @@ create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
 import csv
 
 def save_list_results(url, data):
-    with open(url,"w",newline="") as f:  
-        title = "run_id,query_id,start_time,end_time,elapsed_time,result,row_count".split(",") 
-        cw = csv.DictWriter(f,title,delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        cw.writeheader()
-        cw.writerows(data)
+    data_frame = spark.createDataFrame(data)
+    data_frame.write.format("csv").mode("overwrite").option
 
 # COMMAND ----------
 
@@ -117,7 +114,7 @@ def run_query(run_id, query_number, queries, path_to_save_results, print_result=
         result = spark.sql(queries[query_number-1])
         count = result.count()
         end = time.time()
-        result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results)
+        result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results.format(query_number=query_number))
         stats = {
             "run_id": run_id,
             "query_id": query_number,
@@ -135,9 +132,8 @@ def run_query(run_id, query_number, queries, path_to_save_results, print_result=
         return {}
 
 def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
-    results = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, True) for i in range(len(queries)))
-    print(results)
-    save_list_results(path_to_save_stats, results)
+    stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, True) for i in range(len(queries)))
+    save_list_results(path_to_save_stats, stats)
 
 # COMMAND ----------
 
@@ -147,22 +143,17 @@ def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
 
 def run_test():
     # Run all the dataset from 1G, 2G, and 3G
-    data_sizes = ["1G", "2G", "4G"]
+    data_sizes = ["1G"] #  ["1G", 2G", "4G"]
     
     for i, data_size in enumerate(data_sizes):
         queries_path = "scripts/queries_{size}.sql".format(size=data_size)
-        result_path = "s3://tpcds-spark/results/{size}/test_run_csv".format(size=data_size)
-        stats_path = "s3://tpcds-spark/stats/{size}/test_run_stats_csv".format(size=data_size)
+        result_path = "s3://tpcds-spark/results/{size}/{query_number}/test_run_csv".format(size=data_size)
+        stats_path = "s3://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
         
         queries = load_queries(queries_path)
-        
         run_queries(i+1, queries, result_path, stats_path)
 
 
 # COMMAND ----------
 
 len([5, 12, 14, 16, 20, 21, 23, 24, 32, 37, 39, 40, 50, 62, 64, 77, 80, 82, 92, 94, 95, 98, 99])
-
-# COMMAND ----------
-
-
