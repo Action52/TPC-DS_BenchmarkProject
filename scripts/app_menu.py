@@ -57,8 +57,8 @@ def o1_generatequeries():
     os.chdir("/tpcds-kit/tools")
     os.system(f"""
         ./dsqgen \
-            -DIRECTORY /tpcds-kit/query_templates \
-            -INPUT /tpcds-kit/query_templates/templates.lst \
+            -DIRECTORY {scripts_path}query_templates \
+            -INPUT {scripts_path}query_templates/templates.lst \
             -VERBOSE Y \
             -QUALIFY Y \
             -SCALE {str(scale)} \
