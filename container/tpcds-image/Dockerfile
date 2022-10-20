@@ -37,7 +37,7 @@ WORKDIR /scripts
 #COPY tpcds-image/* .
 COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
 RUN mkdir /tpcds-kit/query_templates_final
-COPY tpcds-image/query_templates/* /tpcds-kit/query_templates_final
+COPY tpcds-image/query_templates/* /tpcds-kit/query_templates
 
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
