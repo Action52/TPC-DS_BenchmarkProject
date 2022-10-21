@@ -17,7 +17,7 @@ import pyspark
 import os
 import logging
 from pyspark import SparkContext
-from pyspark.sql import SQLContext, SparkSession, types
+from pyspark.sql import Row, SQLContext, SparkSession, types
 from tqdm.notebook import tqdm_notebook
 import time
 
@@ -43,18 +43,18 @@ schema = types.StructType([types.StructField("name", types.IntegerType(), True),
                            types.StructField("error", types.BooleanType(), True)
                            ])
 
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
+# AWS_ACCESS_KEY_ID = ""
+# AWS_SECRET_ACCESS_KEY = ""
 
 
 
-spark = SparkSession.builder.appName("tpcds")\
-    .config("spark.pyspark.python", "python") \
-    .enableHiveSupport()\
-    .getOrCreate()
+# spark = SparkSession.builder.appName("tpcds")\
+#     .config("spark.pyspark.python", "python") \
+#     .enableHiveSupport()\
+#     .getOrCreate()
     
-spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", AWS_ACCESS_KEY_ID)
-spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", AWS_SECRET_ACCESS_KEY)
+# spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", AWS_ACCESS_KEY_ID)
+# spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", AWS_SECRET_ACCESS_KEY)
 
 # COMMAND ----------
 
@@ -103,7 +103,7 @@ create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
 import csv
 
 def save_list_results(url, data):
-    data_frame = spark.createDataFrame(data)
+    data_frame = spark.createDataFrame(Row(**x) for x in data)
     data_frame.write.format("csv").mode("overwrite").option("header", "true").save(url)
 
 # COMMAND ----------
