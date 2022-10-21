@@ -1012,9 +1012,9 @@ select  ca_zip
 -- end query 15 in stream 0 using template query15.tpl
 -- start query 16 in stream 0 using template query16.tpl
 select  
-   count(distinct cs_order_number) as "order count"
-  ,sum(cs_ext_ship_cost) as "total shipping cost"
-  ,sum(cs_net_profit) as "total net profit"
+   count(distinct cs_order_number) as order_count
+  ,sum(cs_ext_ship_cost) as total_shipping_cost
+  ,sum(cs_net_profit) as total_net_profit
 from
    catalog_sales cs1
   ,date_dim
@@ -1715,7 +1715,7 @@ with ss as
 
 -- end query 31 in stream 0 using template query31.tpl
 -- start query 32 in stream 0 using template query32.tpl
-select  sum(cs_ext_discount_amt)  as "excess discount amount" 
+select  sum(cs_ext_discount_amt)  as excess_discount_amount
 from 
    catalog_sales 
    ,item 
@@ -2050,8 +2050,8 @@ select
  and i_item_sk          = cs_item_sk
  and cs_warehouse_sk    = w_warehouse_sk 
  and cs_sold_date_sk    = d_date_sk
- and d_date between date_sub((cast ('2001-05-02' as date), 30)
-                and date_add((cast ('2001-05-02' as date), 30) 
+ and d_date between date_sub(cast ('2001-05-02' as date), 30)
+                and date_add(cast ('2001-05-02' as date), 30) 
  group by
     w_state,i_item_id
  order by w_state,i_item_id
@@ -2500,14 +2500,14 @@ select
   ,s_county
   ,s_state
   ,s_zip
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 30) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 60) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 90) and
-                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    store_sales
   ,store_returns
@@ -3065,14 +3065,14 @@ select
    substr(w_warehouse_name,1,20)
   ,sm_type
   ,web_name
-  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 30) and 
-                 (ws_ship_date_sk - ws_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 60) and 
-                 (ws_ship_date_sk - ws_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 90) and
-                 (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    web_sales
   ,warehouse
@@ -3229,8 +3229,8 @@ select cs1.product_name
      ,cs2.s1 as s12
      ,cs2.s2 as s22
      ,cs2.s3 as s32
-     ,cs2.syear
-     ,cs2.cnt
+     ,cs2.syear as syear_2
+     ,cs2.cnt as cnt_2
 from cross_sales cs1,cross_sales cs2
 where cs1.item_sk=cs2.item_sk and
      cs1.syear = 1999 and
@@ -3240,9 +3240,7 @@ where cs1.item_sk=cs2.item_sk and
      cs1.store_zip = cs2.store_zip
 order by cs1.product_name
        ,cs1.store_name
-       ,cs2.cnt
-       ,cs1.s1
-       ,cs2.s1;
+       ,cnt_2;
 
 -- end query 64 in stream 0 using template query64.tpl
 -- start query 65 in stream 0 using template query65.tpl
@@ -4648,7 +4646,7 @@ order by sum(cr_net_loss) desc;
 -- end query 91 in stream 0 using template query91.tpl
 -- start query 92 in stream 0 using template query92.tpl
 select  
-   sum(ws_ext_discount_amt)  as "Excess Discount Amount" 
+   sum(ws_ext_discount_amt)  as excess_discount_amount 
 from 
     web_sales 
    ,item 
@@ -4696,9 +4694,9 @@ limit 100;
 -- end query 93 in stream 0 using template query93.tpl
 -- start query 94 in stream 0 using template query94.tpl
 select  
-   count(distinct ws_order_number) as "order count"
-  ,sum(ws_ext_ship_cost) as "total shipping cost"
-  ,sum(ws_net_profit) as "total net profit"
+   count(distinct ws_order_number) as order_count
+  ,sum(ws_ext_ship_cost) as total_shipping_cost
+  ,sum(ws_net_profit) as total_net_profit
 from
    web_sales ws1
   ,date_dim
@@ -4730,9 +4728,9 @@ with ws_wh as
  where ws1.ws_order_number = ws2.ws_order_number
    and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  select  
-   count(distinct ws_order_number) as "order count"
-  ,sum(ws_ext_ship_cost) as "total shipping cost"
-  ,sum(ws_net_profit) as "total net profit"
+   count(distinct ws_order_number) as order_count
+  ,sum(ws_ext_ship_cost) as total_shipping_cost
+  ,sum(ws_net_profit) as total_net_profit
 from
    web_sales ws1
   ,date_dim
@@ -4834,14 +4832,14 @@ select
    substr(w_warehouse_name,1,20)
   ,sm_type
   ,cc_name
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 30) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 60) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 90) and
-                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    catalog_sales
   ,warehouse

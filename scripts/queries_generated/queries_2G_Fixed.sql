@@ -336,7 +336,7 @@ with ssr as
  from  csr
  union all
  select 'web channel' as channel
-        , concat('web_site',web_site_id as) id
+        , concat('web_site',web_site_id ) as id
         , sales
         , returns
         , (profit - profit_loss) as profit
@@ -1012,9 +1012,9 @@ select  ca_zip
 -- end query 15 in stream 0 using template query15.tpl
 -- start query 16 in stream 0 using template query16.tpl
 select  
-   count(distinct cs_order_number) as "order count"
-  ,sum(cs_ext_ship_cost) as "total shipping cost"
-  ,sum(cs_net_profit) as "total net profit"
+   count(distinct cs_order_number) as order_count
+  ,sum(cs_ext_ship_cost) as total_shipping_cost
+  ,sum(cs_net_profit) as total_net_profit
 from
    catalog_sales cs1
   ,date_dim
@@ -1161,7 +1161,7 @@ select  i_item_id
    and i_category in ('Jewelry', 'Women', 'Home')
    and cs_sold_date_sk = d_date_sk
  and d_date between cast('1998-02-25' as date) 
- 				and (cast('1998-02-25' as date) + 30 days)
+ 				and date_add(cast('1998-02-25' as date),30)
  group by i_item_id
          ,i_item_desc 
          ,i_category
@@ -1193,8 +1193,8 @@ select  *
      and i_item_sk          = inv_item_sk
      and inv_warehouse_sk   = w_warehouse_sk
      and inv_date_sk    = d_date_sk
-     and d_date between (cast ('1999-04-15' as date) - 30 days)
-                    and (cast ('1999-04-15' as date) + 30 days)
+     and d_date between date_sub(cast ('1999-04-15' as date),30)
+                    and date_add(cast ('1999-04-15' as date),30)
    group by w_warehouse_name, i_item_id) x
  where (case when inv_before > 0 
              then inv_after / inv_before 
@@ -1715,7 +1715,7 @@ with ss as
 
 -- end query 31 in stream 0 using template query31.tpl
 -- start query 32 in stream 0 using template query32.tpl
-select  sum(cs_ext_discount_amt)  as "excess discount amount" 
+select  sum(cs_ext_discount_amt)  as excess_discount_amount
 from 
    catalog_sales 
    ,item 
@@ -1724,7 +1724,7 @@ where
 i_manufact_id = 552
 and i_item_sk = cs_item_sk 
 and d_date between '2000-03-20' and 
-        (cast('2000-03-20' as date) + 90 days)
+        date_add(cast('2000-03-20' as date),90)
 and d_date_sk = cs_sold_date_sk 
 and cs_ext_discount_amt  
      > ( 
@@ -1736,7 +1736,7 @@ and cs_ext_discount_amt
          where 
               cs_item_sk = i_item_sk 
           and d_date between '2000-03-20' and
-                             (cast('2000-03-20' as date) + 90 days)
+                             date_add(cast('2000-03-20' as date),90)
           and d_date_sk = cs_sold_date_sk 
       ) 
 limit 100;
@@ -1944,7 +1944,7 @@ select  i_item_id
  where i_current_price between 43 and 43 + 30
  and inv_item_sk = i_item_sk
  and d_date_sk=inv_date_sk
- and d_date between cast('2000-01-08' as date) and (cast('2000-01-08' as date) +  60 days)
+ and d_date between cast('2000-01-08' as date) and date_add(cast('2000-01-08' as date) ,60)
  and i_manufact_id in (667,692,681,689)
  and inv_quantity_on_hand between 100 and 500
  and cs_item_sk = i_item_sk
@@ -2050,8 +2050,8 @@ select
  and i_item_sk          = cs_item_sk
  and cs_warehouse_sk    = w_warehouse_sk 
  and cs_sold_date_sk    = d_date_sk
- and d_date between (cast ('2000-02-01' as date) - 30 days)
-                and (cast ('2000-02-01' as date) + 30 days) 
+ and d_date between date_sub(cast ('2000-02-01' as date), 30)
+                and date_add(cast ('2000-02-01' as date), 30) 
  group by
     w_state,i_item_id
  order by w_state,i_item_id
@@ -2500,14 +2500,14 @@ select
   ,s_county
   ,s_state
   ,s_zip
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 30) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 60) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 90) and
-                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    store_sales
   ,store_returns
@@ -3065,14 +3065,14 @@ select
    substr(w_warehouse_name,1,20)
   ,sm_type
   ,web_name
-  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 30) and 
-                 (ws_ship_date_sk - ws_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 60) and 
-                 (ws_ship_date_sk - ws_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk > 90) and
-                 (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    web_sales
   ,warehouse
@@ -3229,8 +3229,8 @@ select cs1.product_name
      ,cs2.s1 as s12
      ,cs2.s2 as s22
      ,cs2.s3 as s32
-     ,cs2.syear
-     ,cs2.cnt
+     ,cs2.syear as syear_2
+     ,cs2.cnt as cnt_2
 from cross_sales cs1,cross_sales cs2
 where cs1.item_sk=cs2.item_sk and
      cs1.syear = 1999 and
@@ -3240,9 +3240,7 @@ where cs1.item_sk=cs2.item_sk and
      cs1.store_zip = cs2.store_zip
 order by cs1.product_name
        ,cs1.store_name
-       ,cs2.cnt
-       ,cs1.s1
-       ,cs2.s1;
+       ,cnt_2;
 
 -- end query 64 in stream 0 using template query64.tpl
 -- start query 65 in stream 0 using template query65.tpl
@@ -3927,7 +3925,7 @@ with ss as
       store
  where ss_sold_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date) 
-                  and (cast('1999-08-22' as date) +  30 days) 
+                  and date_add(cast('1999-08-22' as date),30) 
        and ss_store_sk = s_store_sk
  group by s_store_sk)
  ,
@@ -3940,7 +3938,7 @@ with ss as
       store
  where sr_returned_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date)
-                  and (cast('1999-08-22' as date) +  30 days)
+                  and date_add(cast('1999-08-22' as date),30)
        and sr_store_sk = s_store_sk
  group by s_store_sk), 
  cs as
@@ -3951,7 +3949,7 @@ with ss as
       date_dim
  where cs_sold_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date)
-                  and (cast('1999-08-22' as date) +  30 days)
+                  and date_add(cast('1999-08-22' as date),30)
  group by cs_call_center_sk 
  ), 
  cr as
@@ -3962,7 +3960,7 @@ with ss as
       date_dim
  where cr_returned_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date)
-                  and (cast('1999-08-22' as date) +  30 days)
+                  and date_add(cast('1999-08-22' as date),30)
  group by cr_call_center_sk
  ), 
  ws as
@@ -3974,7 +3972,7 @@ with ss as
       web_page
  where ws_sold_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date)
-                  and (cast('1999-08-22' as date) +  30 days)
+                  and date_add(cast('1999-08-22' as date),30)
        and ws_web_page_sk = wp_web_page_sk
  group by wp_web_page_sk), 
  wr as
@@ -3986,7 +3984,7 @@ with ss as
       web_page
  where wr_returned_date_sk = d_date_sk
        and d_date between cast('1999-08-22' as date)
-                  and (cast('1999-08-22' as date) +  30 days)
+                  and date_add(cast('1999-08-22' as date),30 )
        and wr_web_page_sk = wp_web_page_sk
  group by wp_web_page_sk)
   select  channel
@@ -4120,7 +4118,7 @@ with ssr as
      promotion
  where ss_sold_date_sk = d_date_sk
        and d_date between cast('1998-08-04' as date) 
-                  and (cast('1998-08-04' as date) +  30 days)
+                  and date_add(cast('1998-08-04' as date),30)
        and ss_store_sk = s_store_sk
        and ss_item_sk = i_item_sk
        and i_current_price > 50
@@ -4141,7 +4139,7 @@ with ssr as
      promotion
  where cs_sold_date_sk = d_date_sk
        and d_date between cast('1998-08-04' as date)
-                  and (cast('1998-08-04' as date) +  30 days)
+                  and date_add(cast('1998-08-04' as date), 30)
         and cs_catalog_page_sk = cp_catalog_page_sk
        and cs_item_sk = i_item_sk
        and i_current_price > 50
@@ -4162,7 +4160,7 @@ group by cp_catalog_page_id)
      promotion
  where ws_sold_date_sk = d_date_sk
        and d_date between cast('1998-08-04' as date)
-                  and (cast('1998-08-04' as date) +  30 days)
+                  and date_add(cast('1998-08-04' as date),30)
         and ws_web_site_sk = web_site_sk
        and ws_item_sk = i_item_sk
        and i_current_price > 50
@@ -4176,21 +4174,21 @@ group by web_site_id)
         , sum(profit) as profit
  from 
  (select 'store channel' as channel
-        , 'store' || store_id as id
+        , concat('store' ,store_id) as id
         , sales
         , returns
         , profit
  from   ssr
  union all
  select 'catalog channel' as channel
-        , 'catalog_page' || catalog_page_id as id
+        , concat( 'catalog_page' ,catalog_page_id) as id
         , sales
         , returns
         , profit
  from  csr
  union all
  select 'web channel' as channel
-        , 'web_site' || web_site_id as id
+        , concat('web_site' , web_site_id) as id
         , sales
         , returns
         , profit
@@ -4241,7 +4239,7 @@ select  i_item_id
  where i_current_price between 43 and 43+30
  and inv_item_sk = i_item_sk
  and d_date_sk=inv_date_sk
- and d_date between cast('2001-04-17' as date) and (cast('2001-04-17' as date) +  60 days)
+ and d_date between cast('2001-04-17' as date) and date_add(cast('2001-04-17' as date),60)
  and i_manufact_id in (261,490,129,670)
  and inv_quantity_on_hand between 100 and 500
  and ss_item_sk = i_item_sk
@@ -4648,7 +4646,7 @@ order by sum(cr_net_loss) desc;
 -- end query 91 in stream 0 using template query91.tpl
 -- start query 92 in stream 0 using template query92.tpl
 select  
-   sum(ws_ext_discount_amt)  as "Excess Discount Amount" 
+   sum(ws_ext_discount_amt)  as excess_discount_amount 
 from 
     web_sales 
    ,item 
@@ -4657,7 +4655,7 @@ where
 i_manufact_id = 195
 and i_item_sk = ws_item_sk 
 and d_date between '2002-01-22' and 
-        (cast('2002-01-22' as date) + 90 days)
+        date_add(cast('2002-01-22' as date),90)
 and d_date_sk = ws_sold_date_sk 
 and ws_ext_discount_amt  
      > ( 
@@ -4669,7 +4667,7 @@ and ws_ext_discount_amt
          WHERE 
               ws_item_sk = i_item_sk 
           and d_date between '2002-01-22' and
-                             (cast('2002-01-22' as date) + 90 days)
+                             date_add(cast('2002-01-22' as date) , 90)
           and d_date_sk = ws_sold_date_sk 
       ) 
 order by sum(ws_ext_discount_amt)
@@ -4696,9 +4694,9 @@ limit 100;
 -- end query 93 in stream 0 using template query93.tpl
 -- start query 94 in stream 0 using template query94.tpl
 select  
-   count(distinct ws_order_number) as "order count"
-  ,sum(ws_ext_ship_cost) as "total shipping cost"
-  ,sum(ws_net_profit) as "total net profit"
+   count(distinct ws_order_number) as order_count
+  ,sum(ws_ext_ship_cost) as total_shipping_cost
+  ,sum(ws_net_profit) as total_net_profit
 from
    web_sales ws1
   ,date_dim
@@ -4706,7 +4704,7 @@ from
   ,web_site
 where
     d_date between '2002-2-01' and 
-           (cast('2002-2-01' as date) + 60 days)
+           date_add(cast('2002-2-01' as date) , 60)
 and ws1.ws_ship_date_sk = d_date_sk
 and ws1.ws_ship_addr_sk = ca_address_sk
 and ca_state = 'KY'
@@ -4730,9 +4728,9 @@ with ws_wh as
  where ws1.ws_order_number = ws2.ws_order_number
    and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  select  
-   count(distinct ws_order_number) as "order count"
-  ,sum(ws_ext_ship_cost) as "total shipping cost"
-  ,sum(ws_net_profit) as "total net profit"
+   count(distinct ws_order_number) as order_count
+  ,sum(ws_ext_ship_cost) as total_shipping_cost
+  ,sum(ws_net_profit) as total_net_profit
 from
    web_sales ws1
   ,date_dim
@@ -4740,7 +4738,7 @@ from
   ,web_site
 where
     d_date between '1999-5-01' and 
-           (cast('1999-5-01' as date) + 60 days)
+           date_add(cast('1999-5-01' as date),60)
 and ws1.ws_ship_date_sk = d_date_sk
 and ws1.ws_ship_addr_sk = ca_address_sk
 and ca_state = 'KS'
@@ -4814,7 +4812,7 @@ where
   	and i_category in ('Books', 'Shoes', 'Electronics')
   	and ss_sold_date_sk = d_date_sk
 	and d_date between cast('2001-01-25' as date) 
-				and (cast('2001-01-25' as date) + 30 days)
+				and date_add(cast('2001-01-25' as date),30 )
 group by 
 	i_item_id
         ,i_item_desc 
@@ -4834,14 +4832,14 @@ select
    substr(w_warehouse_name,1,20)
   ,sm_type
   ,cc_name
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as "30 days" 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 30) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as "31-60 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as 31_to_60_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 60) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as "61-90 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as 61_to_90_days 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 90) and
-                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days" 
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days" 
+                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as 91_to_120_days 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as more_120_days 
 from
    catalog_sales
   ,warehouse
