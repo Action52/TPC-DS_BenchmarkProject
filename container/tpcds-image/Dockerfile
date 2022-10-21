@@ -36,8 +36,9 @@ RUN pip3 install tqdm
 WORKDIR /scripts
 #COPY tpcds-image/* .
 COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
-RUN mkdir /tpcds-kit/query_templates_final
-COPY tpcds-image/query_templates/* /tpcds-kit/query_templates
+
+#RUN mkdir /queries_vol_shared
+#COPY tpcds-image/queries_1G_Fixed.sql /queries_vol_shared
 
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
