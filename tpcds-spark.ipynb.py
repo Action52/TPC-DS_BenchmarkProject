@@ -82,7 +82,7 @@ import csv
 
 def save_list_results(url, data):
     data_frame = spark.createDataFrame(data)
-    data_frame.write.format("csv").mode("overwrite").option
+    data_frame.write.format("csv").mode("overwrite").option("header", "true").save(url)
 
 # COMMAND ----------
 
@@ -142,7 +142,7 @@ def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
 # run_queries(1, queries, "s3://tpcds-spark/results/1G/test_run_csv", "s3://tpcds-spark/stats/1G/test_run_stats_csv")
 
 def run_test():
-    # Run all the dataset from 1G, 2G, and 3G
+    # Run all the dataset from 1G, 2G, and 4G
     data_sizes = ["1G"] #  ["1G", 2G", "4G"]
     
     for i, data_size in enumerate(data_sizes):
@@ -152,8 +152,3 @@ def run_test():
         
         queries = load_queries(queries_path)
         run_queries(i+1, queries, result_path, stats_path)
-
-
-# COMMAND ----------
-
-len([5, 12, 14, 16, 20, 21, 23, 24, 32, 37, 39, 40, 50, 62, 64, 77, 80, 82, 92, 94, 95, 98, 99])
