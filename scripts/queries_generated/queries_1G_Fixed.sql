@@ -336,7 +336,7 @@ with ssr as
  from  csr
  union all
  select 'web channel' as channel
-        , concat('web_site',web_site_id as) id
+        , concat('web_site',web_site_id ) as id
         , sales
         , returns
         , (profit - profit_loss) as profit
