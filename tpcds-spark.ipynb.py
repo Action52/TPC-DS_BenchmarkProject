@@ -17,7 +17,7 @@ import pyspark
 import os
 import logging
 from pyspark import SparkContext
-from pyspark.sql import SQLContext, SparkSession
+from pyspark.sql import SQLContext, SparkSession, types
 from tqdm.notebook import tqdm_notebook
 import time
 
@@ -30,9 +30,31 @@ tables = ["call_center", "catalog_page", "catalog_returns", "catalog_sales",
             ]
 
 data_size = "1G"  # 2GB 4GB
-s3_bucket = "s3n://tpcds-spark/"
+s3_bucket = "s3a://tpcds-spark/"
 db_name = "tpcds"
 schemas_location = "scripts/queries/table/"
+schema = types.StructType([types.StructField("name", types.IntegerType(), True), 
+                           types.StructField("query_id", types.IntegerType(), True), 
+                           types.StructField("start_time", types.DoubleType(), True),
+                           types.StructField("end_time", types.DoubleType(), True),
+                           types.StructField("elapsed_time", types.DoubleType(), True),
+                           types.StructField("result", types.StringType(), True),
+                           types.StructField("row_count", types.IntegerType(), True),
+                           types.StructField("error", types.BooleanType(), True)
+                           ])
+
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
+
+
+
+spark = SparkSession.builder.appName("tpcds")\
+    .config("spark.pyspark.python", "python") \
+    .enableHiveSupport()\
+    .getOrCreate()
+    
+spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", AWS_ACCESS_KEY_ID)
+spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", AWS_SECRET_ACCESS_KEY)
 
 # COMMAND ----------
 
@@ -108,31 +130,45 @@ def load_queries(path_to_queries) -> list:
                 comment_count = 0
     return queries
 
-def run_query(run_id, query_number, queries, path_to_save_results, print_result=False):
+def run_query(run_id, query_number, queries, path_to_save_results, data_size, print_result=False):
     try:
+        print(run_id, query_number, queries)
         start = time.time()
         result = spark.sql(queries[query_number-1])
         count = result.count()
         end = time.time()
-        result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results.format(query_number=query_number))
+        result.write.format("csv").mode("overwrite").option("header", "true").save(path_to_save_results.format(size=data_size, query_number=query_number))
         stats = {
             "run_id": run_id,
             "query_id": query_number,
             "start_time": start,
             "end_time": end,
             "elapsed_time": end-start,
-            "result": result.show(),
-            "row_count": count
+            "row_count": count,
+            'error': False
         }
         if (print_result is True):
             print(stats)
             print(result.show())
         return stats
-    except:
-        return {}
+    except Exception as e:
+        return {
+            "run_id": run_id,
+            "query_id": query_number,
+            "start_time": time.time(),
+            "end_time": time.time(),
+            "elapsed_time": 0,
+            "row_count": 0,
+            "error": True
+        }
 
-def run_queries(run_id, queries, path_to_save_results, path_to_save_stats):
-    stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, True) for i in range(len(queries)))
+def run_queries(run_id, queries, path_to_save_results, path_to_save_stats, data_size):
+    print("running queries", path_to_save_results, path_to_save_stats)
+    # stats = []
+    # for i in range(len(queries)):
+    #     stats.append(run_query(run_id, i+1, queries, path_to_save_results, data_size, True))
+    stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, data_size, True) for i in range(len(queries)))
+    print(stats)
     save_list_results(path_to_save_stats, stats)
 
 # COMMAND ----------
@@ -146,9 +182,12 @@ def run_test():
     data_sizes = ["1G"] #  ["1G", 2G", "4G"]
     
     for i, data_size in enumerate(data_sizes):
-        queries_path = "scripts/queries_{size}.sql".format(size=data_size)
-        result_path = "s3://tpcds-spark/results/{size}/{query_number}/test_run_csv".format(size=data_size)
-        stats_path = "s3://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
+        queries_path = "scripts/queries_generated/queries_{size}_Fixed.sql".format(size=data_size)
+        result_path = "s3a://tpcds-spark/results/{size}/{query_number}/test_run_csv"
+        stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
         
-        queries = load_queries(queries_path)
-        run_queries(i+1, queries, result_path, stats_path)
+        queries = load_queries(queries_path)[0:1]
+        print("Processing queries")
+        run_queries(i+1, queries, result_path, stats_path, data_size)
+
+run_test()
