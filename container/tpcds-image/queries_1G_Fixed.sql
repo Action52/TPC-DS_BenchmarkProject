@@ -1715,7 +1715,7 @@ with ss as
 
 -- end query 31 in stream 0 using template query31.tpl
 -- start query 32 in stream 0 using template query32.tpl
-select  sum(cs_ext_discount_amt)  as 'excess discount amount'
+select  sum(cs_ext_discount_amt)  as excess_discount_amount
 from 
    catalog_sales 
    ,item 
@@ -4648,7 +4648,7 @@ order by sum(cr_net_loss) desc;
 -- end query 91 in stream 0 using template query91.tpl
 -- start query 92 in stream 0 using template query92.tpl
 select  
-   sum(ws_ext_discount_amt)  as 'Excess Discount Amount' 
+   sum(ws_ext_discount_amt)  as excess_discount_amount 
 from 
     web_sales 
    ,item 
