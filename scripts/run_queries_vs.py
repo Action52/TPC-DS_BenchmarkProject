@@ -1,6 +1,8 @@
 """
 This scripts parses the queries sql file, transforms them into pyspark format, and executes them.
 """
+#/dsqgen -DIRECTORY ../query_templates -INPUT ../query_templates/templates.lst -VERBOSE Y -QUALIFY Y -SCALE 1 -DIALECT spark -OUTPUT_DIR /tmp
+#cp /tmp/query_0.sql '/Users/lauraforerocamacho/Downloads/Maestria/DataWarehouses/Final/TDC-DS_BenchmarkProject/scripts/queries_generated/1G'
 from pyspark.sql import SparkSession
 from argparse import ArgumentParser
 from tqdm import tqdm
