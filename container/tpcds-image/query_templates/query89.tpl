@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -33,7 +33,7 @@
 -- Contributors:
 -- 
 define YEAR = random(1998, 2002, uniform);
-define IDX = ulist(random(1, rowcount("categories"), uniform), 6);
+define IDX = ulist(random(1, rowcount('categories'), uniform), 6);
 define CAT_A = distmember(categories, [IDX.1], 1);
 define CLASS_A = DIST(distmember(categories, [IDX.1], 2), 1, 1);
 define CAT_B = distmember(categories, [IDX.2], 1);

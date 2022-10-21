@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -35,7 +35,7 @@
  define DEPCNT=random(0,9,uniform);
  define YEAR = random(1998,2000,uniform);
  define VEHCNT=random(-1,4,uniform);
- define CITYNUMBER = ulist(random(1, rowcount("active_cities", "store"), uniform),5);
+ define CITYNUMBER = ulist(random(1, rowcount('active_cities', 'store'), uniform),5);
  define CITY_A = distmember(cities, [CITYNUMBER.1], 1);
  define CITY_B = distmember(cities, [CITYNUMBER.2], 1);
  define CITY_C = distmember(cities, [CITYNUMBER.3], 1);

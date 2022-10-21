@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -32,10 +32,10 @@
 -- 
 -- Contributors:
 -- 
-define COUNTY = random(1, rowcount("active_counties", "store"), uniform);
+define COUNTY = random(1, rowcount('active_counties', 'store'), uniform);
 define STATE = distmember(fips_county, [COUNTY], 3); 
 define YEAR = random(1998, 2002, uniform);
-define AGG_FIELD = text({"SR_RETURN_AMT",1},{"SR_FEE",1},{"SR_REFUNDED_CASH",1},{"SR_RETURN_AMT_INC_TAX",1},{"SR_REVERSED_CHARGE",1},{"SR_STORE_CREDIT",1},{"SR_RETURN_TAX",1});
+define AGG_FIELD = text({'SR_RETURN_AMT',1},{'SR_FEE',1},{'SR_REFUNDED_CASH',1},{'SR_RETURN_AMT_INC_TAX',1},{'SR_REVERSED_CHARGE',1},{'SR_STORE_CREDIT',1},{'SR_RETURN_TAX',1});
 define _LIMIT=100;
 
 with customer_total_return as

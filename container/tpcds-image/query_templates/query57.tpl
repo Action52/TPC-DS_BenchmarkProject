@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -33,9 +33,9 @@
 -- Contributors:
 -- 
  define YEAR=random(1999,2001,uniform);
- define SELECTONE= text({"v1.i_category",1},{"v1.i_brand",1},{"v1.i_category, v1.i_brand",1},{"v1.cc_name",1},{"v1.i_category, v1.i_brand, v1.cc_name",1}); 
- define SELECTTWO= text({",v1.d_year",1},{",v1.d_year, v1.d_moy",1}); 
- define ORDERBY= text({"avg_monthly_sales",1},{"sum_sales",1},{"psum",1},{"nsum",1});
+ define SELECTONE= text({'v1.i_category',1},{'v1.i_brand',1},{'v1.i_category, v1.i_brand',1},{'v1.cc_name',1},{'v1.i_category, v1.i_brand, v1.cc_name',1}); 
+ define SELECTTWO= text({',v1.d_year',1},{',v1.d_year, v1.d_moy',1}); 
+ define ORDERBY= text({'avg_monthly_sales',1},{'sum_sales',1},{'psum',1},{'nsum',1});
 
  define _LIMIT=100;
 

@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -34,10 +34,10 @@
 -- 
 define IMID  = random(1,1000,uniform); 
 define YEAR  = random(1998,2002,uniform);
-define CSDATE = date([YEAR]+"-01-01",[YEAR]+"-04-01",sales);
+define CSDATE = date([YEAR]+'-01-01',[YEAR]+'-04-01',sales);
 define _LIMIT=100;
 
-[_LIMITA] select [_LIMITB] sum(cs_ext_discount_amt)  as "excess discount amount" 
+[_LIMITA] select [_LIMITB] sum(cs_ext_discount_amt)  as 'excess discount amount' 
 from 
    catalog_sales 
    ,item 

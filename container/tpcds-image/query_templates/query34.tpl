@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -32,10 +32,10 @@
 -- 
 -- Contributors:
 -- 
- define BPONE= text({"1001-5000",1},{">10000",1},{"501-1000",1});
- define BPTWO= text({"0-500",1},{"Unknown",1},{"5001-10000",1});
+ define BPONE= text({'1001-5000',1},{'>10000',1},{'501-1000',1});
+ define BPTWO= text({'0-500',1},{'Unknown',1},{'5001-10000',1});
  define YEAR= random(1998, 2000, uniform);
- define COUNTYNUMBER=ulist(random(1, rowcount("active_counties", "store"), uniform), 8);
+ define COUNTYNUMBER=ulist(random(1, rowcount('active_counties', 'store'), uniform), 8);
  define COUNTY_A=distmember(fips_county, [COUNTYNUMBER.1], 2);
  define COUNTY_B=distmember(fips_county, [COUNTYNUMBER.2], 2);
  define COUNTY_C=distmember(fips_county, [COUNTYNUMBER.3], 2);

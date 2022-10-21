@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -35,10 +35,10 @@
   define YEAR= random(1998, 2002, uniform);
  define TIMEONE= random(1, 57597, uniform);
  define SMC = ulist(dist(ship_mode_carrier, 1, 1),2);
- define NETONE = text({"ws_net_paid",1},{"ws_net_paid_inc_tax",1},{"ws_net_paid_inc_ship",1},{"ws_net_paid_inc_ship_tax",1},{"ws_net_profit",1});
- define NETTWO = text({"cs_net_paid",1},{"cs_net_paid_inc_tax",1},{"cs_net_paid_inc_ship",1},{"cs_net_paid_inc_ship_tax",1},{"cs_net_profit",1});
- define SALESONE = text({"ws_sales_price",1},{"ws_ext_sales_price",1},{"ws_ext_list_price",1});
- define SALESTWO = text({"cs_sales_price",1},{"cs_ext_sales_price",1},{"cs_ext_list_price",1});
+ define NETONE = text({'ws_net_paid',1},{'ws_net_paid_inc_tax',1},{'ws_net_paid_inc_ship',1},{'ws_net_paid_inc_ship_tax',1},{'ws_net_profit',1});
+ define NETTWO = text({'cs_net_paid',1},{'cs_net_paid_inc_tax',1},{'cs_net_paid_inc_ship',1},{'cs_net_paid_inc_ship_tax',1},{'cs_net_profit',1});
+ define SALESONE = text({'ws_sales_price',1},{'ws_ext_sales_price',1},{'ws_ext_list_price',1});
+ define SALESTWO = text({'cs_sales_price',1},{'cs_ext_sales_price',1},{'cs_ext_list_price',1});
  define _LIMIT=100; 
  
  [_LIMITA] select [_LIMITB]  

@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -32,9 +32,9 @@
 -- 
 -- Contributors:
 -- 
-define AGGCTHEN= text({"ss_ext_discount_amt",1},{"ss_ext_sales_price",1},{"ss_ext_list_price",1},{"ss_ext_tax",1});
-define AGGCELSE= text({"ss_net_paid",1},{"ss_net_paid_inc_tax",1},{"ss_net_profit",1});
-define RC=ulist(random(1, rowcount("store_sales")/5,uniform),5);
+define AGGCTHEN= text({'ss_ext_discount_amt',1},{'ss_ext_sales_price',1},{'ss_ext_list_price',1},{'ss_ext_tax',1});
+define AGGCELSE= text({'ss_net_paid',1},{'ss_net_paid_inc_tax',1},{'ss_net_profit',1});
+define RC=ulist(random(1, rowcount('store_sales')/5,uniform),5);
 
 select case when (select count(*) 
                   from store_sales 

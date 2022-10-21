@@ -1,7 +1,7 @@
 --
 -- Legal Notice 
 -- 
--- This document and associated source code (the "Work") is a part of a 
+-- This document and associated source code (the 'Work') is a part of a 
 -- benchmark specification maintained by the TPC. 
 -- 
 -- The TPC reserves all right, title, and interest to the Work as provided 
@@ -11,7 +11,7 @@
 -- No Warranty 
 -- 
 -- 1.1 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE INFORMATION 
---     CONTAINED HEREIN IS PROVIDED "AS IS" AND WITH ALL FAULTS, AND THE 
+--     CONTAINED HEREIN IS PROVIDED 'AS IS' AND WITH ALL FAULTS, AND THE 
 --     AUTHORS AND DEVELOPERS OF THE WORK HEREBY DISCLAIM ALL OTHER 
 --     WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED OR STATUTORY, 
 --     INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED WARRANTIES, 
@@ -33,10 +33,10 @@
 -- Contributors:
 -- 
  define YEAR=random(1998,2001,uniform);
- define SELECTONE= text({"t_s_secyear.customer_preferred_cust_flag",1}
-                       ,{"t_s_secyear.customer_birth_country",1}
-                       ,{"t_s_secyear.customer_login",1}
-                       ,{"t_s_secyear.customer_email_address",1});
+ define SELECTONE= text({'t_s_secyear.customer_preferred_cust_flag',1}
+                       ,{'t_s_secyear.customer_birth_country',1}
+                       ,{'t_s_secyear.customer_login',1}
+                       ,{'t_s_secyear.customer_email_address',1});
  define _LIMIT=100;
 
  with year_total as (
