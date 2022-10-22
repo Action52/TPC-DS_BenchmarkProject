@@ -135,3 +135,4 @@ scripts/metastore_db
 scripts/derby.log
 
 .idea/*
+.DS_Store
