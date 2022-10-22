@@ -33,9 +33,13 @@ RUN yum install -y nano
 RUN yum install -y python3
 RUN pip3 install pyspark
 RUN pip3 install tqdm
-WORKDIR /home
+WORKDIR /scripts
 #COPY tpcds-image/* .
 COPY tpcds-image/sparksql.txt /tpcds-kit/query_templates/sparksql.tpl
+
+#RUN mkdir /queries_vol_shared
+#COPY tpcds-image/queries_1G_Fixed.sql /queries_vol_shared
+
 #RUN git clone https://github.com/Action52/TDC-DS_BenchmarkProject.git
 # WORKDIR TDC-DS_BenchmarkProject
 ### RUN git fetch && git checkout isa
