@@ -1,5 +1,5 @@
-drop table if exists web_page_tmp;
-create table web_page_tmp (
+drop table if exists web_page;
+create table web_page (
     wp_web_page_sk            int,
     wp_web_page_id            string,
     wp_rec_start_date         string,
@@ -14,7 +14,4 @@ create table web_page_tmp (
     wp_link_count             int,
     wp_image_count            int,
     wp_max_ad_count           int
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists web_page;
-create table web_page using parquet location '${path}/${name}/parquet' as (select * from web_page_tmp);
-drop table if exists web_page_tmp;
+) using parquet options ( path "${data_path}" )

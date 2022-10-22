@@ -1,5 +1,5 @@
-drop table if exists customer_tmp;
-create table customer_tmp (
+drop table if exists customer;
+create table customer (
   c_customer_sk integer, c_customer_id string, 
   c_current_cdemo_sk integer, c_current_hdemo_sk integer, 
   c_current_addr_sk integer, c_first_shipto_date_sk integer, 
@@ -9,7 +9,4 @@ create table customer_tmp (
   c_birth_month integer, c_birth_year integer, 
   c_birth_country string, c_login string, 
   c_email_address string, c_last_review_date_sk integer
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists customer;
-create table customer using parquet location '${path}/${name}/parquet' as (select * from customer_tmp);
-drop table if exists customer_tmp;
+) using parquet options ( path "${data_path}" )
