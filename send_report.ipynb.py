@@ -98,7 +98,7 @@ import datetime
 import base64
 import glob
 
-def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], bcc=[], access_key=None, secrey_key=None):
+def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], bcc=[], access_key=None, secret_key=None):
     attachment_ready_html = []
     img_id = 0
     mime_images = []
