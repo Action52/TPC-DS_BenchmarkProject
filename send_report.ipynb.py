@@ -98,7 +98,7 @@ import datetime
 import base64
 import glob
 
-def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], bcc=[]):
+def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], bcc=[], access_key=None, secrey_key=None):
     attachment_ready_html = []
     img_id = 0
     mime_images = []
@@ -133,8 +133,8 @@ def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], 
   
     ses = boto3.client('ses', 
                        region_name='us-east-1', 
-                       aws_access_key_id='AKIAXXXAAHQTR5OI3QRB',
-                       aws_secret_access_key='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'
+                       aws_access_key_id=access_key,
+                       aws_secret_access_key=secret_key
                       )
     ses.send_raw_email(
         Source=msg['FROM'],
@@ -262,10 +262,14 @@ html = create_mail_content()
 #previewHTMLEmail(html)
 try:
     to_mail = dbutils.widgets.get("mail_to_send_report")
+    aws_secret = dbutils.widgets.get("aws_secret")
+    aws_key = dbutils.widgets.get("aws_key")
 except Exception as e:
     to_mail = "luis.leon.villapun@ulb.be"
+    aws_secret = None
+    aws_key = None
     
-send_email("luis.leon.villapun@ulb.be", to_mail, "Test", body_html=html)
+send_email("luis.leon.villapun@ulb.be", to_mail, "Test", body_html=html, access_key=aws_key, secret_key=aws_secret)
 
 # COMMAND ----------
 
