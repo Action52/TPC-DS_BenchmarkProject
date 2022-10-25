@@ -1,0 +1,50 @@
+{
+  "name": "tpcds-job",
+  "notebook_task": {
+    "source": "GIT",
+    "notebook_path": "tpcds-spark.ipynb"
+  },
+  "email_notifications": {
+    "on_success": [
+      "luis.leon.villapun@ulb.be"
+    ],
+    "on_failure": [
+      "luis.leon.villapun@ulb.be"
+    ]
+  },
+  "git_source": {
+    "git_url": "https://github.com/Action52/TDC-DS_BenchmarkProject",
+    "git_provider": "gitHub",
+    "git-branch": "databricks-luis"
+  },
+  "job_clusters": [
+    {
+        "num_workers": 0,
+        "cluster_name": "tpcds-cluster-job-cli",
+        "spark_version": "11.0.x-scala2.12",
+        "spark_conf": {
+            "spark.master": "local[*]",
+            "spark.databricks.cluster.profile": "singleNode"
+        },
+        "aws_attributes": {
+            "first_on_demand": 0,
+            "availability": "SPOT_WITH_FALLBACK",
+            "zone_id": "us-east-1f",
+            "instance_profile_arn": "arn:aws:iam::531971980327:instance-profile/databricks-workspace-stack-5-access-data-buckets",
+            "spot_bid_price_percent": 100,
+            "ebs_volume_count": 0
+        },
+        "node_type_id": "m5d.large",
+        "driver_node_type_id": "m5d.large",
+        "ssh_public_keys": [],
+        "custom_tags": {
+            "Origin": "AWSQuickstartCloudformationLambda",
+            "DatabricksDefault": "true",
+            "ResourceClass": "SingleNode"
+        },
+        "spark_env_vars": {},
+        "enable_elastic_disk": false,
+        "init_scripts": []
+    }
+  ]
+}
