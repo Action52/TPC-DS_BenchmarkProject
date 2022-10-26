@@ -20,21 +20,6 @@ the access credentials to configure a test user are included in the written repo
 You can also create your own databricks workspace with your account and later on attach the script and notebook to 
 run the pipeline.
 
-Now we'll have to create a spark cluster that will be in charge of processing all the data assignments we send to it.
-Jupyter notebooks (such as the one included here) can be attached to databricks. Another option is running a script.
-To bring up the cluster, we'll keep using the CLI.
-
-```
-databricks clusters create --json-file scripts/create-cluster.json
-```
-
-Check the status of the cluster until it is up with 
-
-```
-databricks clusters get --cluster-name <CLUSTER-NAME>
-```
-
-for the example, the cluster-name is basic-starter-cluster-cli.
 
 * * *
 ### Running the pipeline
@@ -43,26 +28,14 @@ To run the pipeline, let's first create a job with databricks.
 First, edit the scripts/run_tpcds_notebook_on_databricks.json file to contain your mail:
 
 ```
-{
-  "name": "tpcds-job",
-  "notebook_task": {
-    "source": "GIT",
-    "notebook_path": "tpcds-spark.ipynb"
-  },
   "email_notifications": {
     "on_success": [
       "<YOUR-MAIL-HERE>"
     ],
     "on_failure": [
-      ""<YOUR-MAIL-HERE>"
+      "<YOUR-MAIL-HERE>"
     ]
-  },
-  "git_source": {
-    "git_url": "https://github.com/Action52/TDC-DS_BenchmarkProject",
-    "git_provider": "gitHub",
-    "git-branch": "databricks-luis"
   }
-}
 ```
 
 ```
@@ -71,6 +44,19 @@ databricks jobs create --json-file scripts/run_tpcds_notebook_on_databricks_job.
 ```
 
 This json file will create a databricks job that will, when triggered, execute the jupyter notebook
-with the tpcds pipeline that we have generated. You can also check the notebook manually at the databricks web UI.
+with the tpcds pipeline that we have generated. You can also check the notebooks manually at the databricks web UI.  
+Upon creation, the CLI will return a "job-id" that we can use to call the job.
+You can always check the job-id of your created jobs by doing:
 
-To execute 
+```
+databricks jobs list 
+```
+
+This json file will create a databricks job that will, when triggered, execute the jupyter notebook
+with the tpcds pipeline that we have generated. You can also check the notebooks manually at the databricks web UI.
+
+To trigger the job, run this command:
+
+```
+databricks jobs list 
+```
