@@ -111,8 +111,6 @@ def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], 
             mime_images.append(mime_img)
         else:
             attachment_ready_html.append(l)
-            print("Added {} images".format(img_id))
-            
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = from_email
@@ -261,7 +259,6 @@ try:
     aws_secret = dbutils.widgets.get("aws_secret")
     aws_key = dbutils.widgets.get("aws_key")
 except Exception as e:
-    print(e)
     to_mail = "satria.wicaksono@ulb.be"
     aws_secret = None
     aws_key = None

@@ -3,7 +3,7 @@
 # MAGIC # Spark SQL TPC-DS
 # MAGIC ## Testing decision support queries on a Spark Databricks deployment.
 # MAGIC 
-# MAGIC The purpose of this notebook is to execute the tpc-ds benchmark on a spark environment in the cloud. Modern implementations of data warehouses are almost certainly on the cloud. Let's evaluate how they behave assuming a small system (for testing and cost purposes). This testing framework works with scale factors of 1, 2, and 4GB sizes.
+# MAGIC The purpose of this notebook is to execute the tpc-ds benchmark on a spark environment in the cloud. Modern implementations of data warehouses are almost certainly on the cloud. Let's evaluate how they behave assuming a small system (for testing and cost purposes). This testing framework works with scale factors of 1, 2, 3 and 4GB sizes.
 
 # COMMAND ----------
 
@@ -138,8 +138,6 @@ def run_query(run_id, query_number, queries, path_to_save_results, data_size, pr
             print(result.show())
         return stats
     except Exception as e:
-        #print(query_number)
-        #print(traceback.print_exc())
         return {
             "run_id": run_id,
             "query_id": query_number,
@@ -151,14 +149,14 @@ def run_query(run_id, query_number, queries, path_to_save_results, data_size, pr
         }
 
 def run_queries(run_id, queries, path_to_save_results, path_to_save_stats, data_size, print_result=False):
-    with Pool(processes=NUM_POOLS) as pool:
-        stats = pool.starmap(run_query, [(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries))])
-#     stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries)))
+#     with Pool(processes=NUM_POOLS) as pool:
+#         stats = pool.starmap(run_query, [(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries))])
+    stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries)))
     save_list_results(path_to_save_stats, stats)
 
 # COMMAND ----------
 
-def run(data_sizes=['1G', '2G', '3G', '4G']):    
+def run(data_sizes=['1G']):    
     for i, data_size in enumerate(data_sizes):
         queries_path = "scripts/queries_generated/queries_{size}_Fixed.sql".format(size=data_size)
         result_path = "s3a://tpcds-spark/results/{size}/{query_number}/test_run_csv"
@@ -169,14 +167,14 @@ def run(data_sizes=['1G', '2G', '3G', '4G']):
         
         # Load queries for the given size
         queries = load_queries(queries_path)
-        #queries_need_to_be_fixed = [queries[13], queries[22], queries[23], queries[34], queries[38]]
+#         queries_need_to_be_fixed = [queries[13], queries[22], queries[23], queries[34], queries[38]]
         
         run_queries(i+1, queries, result_path, stats_path, data_size)
 
 # COMMAND ----------
 
 # Please don't run full pipeline unless ready, try with run(data_sizes=['1G'])
-run()
+run(data_sizes=['1G', '2G', '3G', '4G'])
 
 # COMMAND ----------
 
@@ -193,7 +191,7 @@ import math
 
 
 def get_visualization_tables_per_scale():
-    data_sizes = ["1G", "2G", "4G" ]# "3G"] #  ["1G", 2G", "4G"]
+    data_sizes = ["1G", "2G", "3G","4G" ]# "3G"] #  ["1G", 2G", "4G"]
     
     for i, data_size in enumerate(data_sizes):
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
@@ -211,7 +209,7 @@ def get_visualization_tables_per_scale():
         df.plot(x="query_id", y="elapsed_time", kind="bar", figsize=(20,10), title=f"Query runtime for scale factor {data_size}")
 
 def get_visualization_tables_per_scale_for_all():
-    data_sizes = ["1G", "2G", "4G"]#, "2G", "3G"] #  ["1G", 2G", "4G"]
+    data_sizes = ["1G", "2G", "3G","4G"]#, "2G", "3G"] #  ["1G", 2G", "4G"]
     dfs=[]
     for i, data_size in enumerate(data_sizes):
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
@@ -250,8 +248,8 @@ get_visualization_tables_per_scale_for_all()
 
 # COMMAND ----------
 
-data_sizes = ["1G", "2G", "4G"]
-dfs=[]zx
+data_sizes = ["1G", "2G", "3G","4G"]
+dfs=[]
 for i, data_size in enumerate(data_sizes):
     stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
     schema = types.StructType([types.StructField("run_id", types.IntegerType(), True), 
