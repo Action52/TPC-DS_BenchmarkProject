@@ -5,8 +5,7 @@ import math
 from pyspark.sql import types
 from pyspark.sql.functions import col
 
-def get_visualization_tables_per_scale():
-    data_sizes = ["1G", "2G", "4G" ]# "3G"] #  ["1G", 2G", "4G"]
+def get_visualization_tables_per_scale(data_sizes = ["1G", "2G", "3G", "4G"]):
     dfs = []
     for i, data_size in enumerate(data_sizes):
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
@@ -25,8 +24,7 @@ def get_visualization_tables_per_scale():
         dfs.append(df)
     return dfs
 
-def get_visualization_tables_per_scale_for_all():
-    data_sizes = ["1G", "2G", "4G"]#, "2G", "3G"] #  ["1G", 2G", "4G"]
+def get_visualization_tables_per_scale_for_all(    data_sizes = ["1G", "2G", "3G","4G"]):
     dfs=[]
     for i, data_size in enumerate(data_sizes):
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
@@ -61,8 +59,7 @@ def runtime_per_query_per_scale(df_final):
 from pyspark.sql import types
 from pyspark.sql.functions import col
 
-def retrieve_stats():
-    data_sizes = ["1G", "2G", "4G"]
+def retrieve_stats(data_sizes = ["1G", "2G", "3G", "4G"]):
     dfs=[]
     for i, data_size in enumerate(data_sizes):
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
@@ -174,13 +171,12 @@ import base64
 
 mail_to_send_results_to = "luis.leon.villapun@ulb.be"#dbutils.widgets.get("mail_to_send_report")
 
-def create_mail_images():
+def create_mail_images(data_sizes = ["1G", "2G", "3G", "4G"]):
     images = {}
     images['per_scale_factor'] = []
     images['all_scale_factors'] = None
     images['per_query'] = []
     img_format = 'png'
-    data_sizes = ["1G", "2G", "4G"]
     dfs_per_scale_factor = get_visualization_tables_per_scale()
     for df, data_size in zip(dfs_per_scale_factor, data_sizes):
         df_plt = df.plot(x="query_id", y="elapsed_time", kind="bar", figsize=(15,7), title=f"Query runtime for scale factor {data_size}")
@@ -268,7 +264,6 @@ except Exception as e:
     to_mail = "luis.leon.villapun@ulb.be"
     aws_secret = None
     aws_key = None
-    
 send_email("luis.leon.villapun@ulb.be", to_mail, "Test", body_html=html, access_key=aws_key, secret_key=aws_secret)
 
 # COMMAND ----------
