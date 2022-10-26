@@ -74,7 +74,8 @@ group by c_last_name
         ,i_current_price
         ,i_manager_id
         ,i_units
-        ,i_size)
+        ,i_size),
+        result_1 as(
 select c_last_name
       ,c_first_name
       ,s_store_name
@@ -89,9 +90,7 @@ having sum(netpaid) > (select 0.05*avg(netpaid)
 order by c_last_name
         ,c_first_name
         ,s_store_name
-;
-
-with ssales as
+), ssales_two as
 (select c_last_name
       ,c_first_name
       ,s_store_name
@@ -132,16 +131,14 @@ select c_last_name
       ,c_first_name
       ,s_store_name
       ,sum(netpaid) paid
-from ssales
+from ssales_two
 where i_color = '[COLOR.2]'
 group by c_last_name
         ,c_first_name
         ,s_store_name
 having sum(netpaid) > (select 0.05*avg(netpaid)
-                           from ssales)
+                           from ssales_two)
 order by c_last_name
         ,c_first_name
         ,s_store_name
 ;
-
- 

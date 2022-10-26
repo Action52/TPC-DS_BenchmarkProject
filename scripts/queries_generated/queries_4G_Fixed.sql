@@ -838,7 +838,8 @@ with  cross_items as
        from web_sales
            ,date_dim
        where ws_sold_date_sk = d_date_sk
-         and d_year between 2000 and 2000 + 2) x)
+         and d_year between 2000 and 2000 + 2) x),
+         result_1 as (
   select  channel, i_brand_id,i_class_id,i_category_id,sum(sales), sum(number_sales)
  from(
        select 'store' channel, i_brand_id,i_class_id
@@ -881,8 +882,8 @@ with  cross_items as
  ) y
  group by rollup (channel, i_brand_id,i_class_id,i_category_id)
  order by channel,i_brand_id,i_class_id,i_category_id
- limit 100;
-with  cross_items as
+ limit 100),
+   cross_items_two as
  (select i_item_sk ss_item_sk
  from item,
  (select iss.i_brand_id brand_id
@@ -918,7 +919,7 @@ with  cross_items as
       and i_class_id = class_id
       and i_category_id = category_id
 ),
- avg_sales as
+ avg_sales_two as
 (select avg(quantity*list_price) average_sales
   from (select ss_quantity quantity
              ,ss_list_price list_price
@@ -958,7 +959,7 @@ with  cross_items as
  from store_sales 
      ,item
      ,date_dim
- where ss_item_sk in (select ss_item_sk from cross_items)
+ where ss_item_sk in (select ss_item_sk from cross_items_two)
    and ss_item_sk = i_item_sk
    and ss_sold_date_sk = d_date_sk
    and d_week_seq = (select d_week_seq
@@ -967,13 +968,13 @@ with  cross_items as
                        and d_moy = 12
                        and d_dom = 9)
  group by i_brand_id,i_class_id,i_category_id
- having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales)) this_year,
+ having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales_two)) this_year,
  (select 'store' channel, i_brand_id,i_class_id
         ,i_category_id, sum(ss_quantity*ss_list_price) sales, count(*) number_sales
  from store_sales
      ,item
      ,date_dim
- where ss_item_sk in (select ss_item_sk from cross_items)
+ where ss_item_sk in (select ss_item_sk from cross_items_two)
    and ss_item_sk = i_item_sk
    and ss_sold_date_sk = d_date_sk
    and d_week_seq = (select d_week_seq
@@ -982,7 +983,7 @@ with  cross_items as
                        and d_moy = 12
                        and d_dom = 9)
  group by i_brand_id,i_class_id,i_category_id
- having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales)) last_year
+ having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales_two)) last_year
  where this_year.i_brand_id= last_year.i_brand_id
    and this_year.i_class_id = last_year.i_class_id
    and this_year.i_category_id = last_year.i_category_id
@@ -1255,7 +1256,9 @@ with frequent_ss_items as
   having sum(ss_quantity*ss_sales_price) > (95/100.0) * (select
   *
 from
- max_store_sales))
+ max_store_sales)),
+ result_1 as (
+ 
   select  sum(sales)
  from (select cs_quantity*cs_list_price sales
        from catalog_sales
@@ -1274,8 +1277,9 @@ from
          and ws_sold_date_sk = d_date_sk 
          and ws_item_sk in (select item_sk from frequent_ss_items)
          and ws_bill_customer_sk in (select c_customer_sk from best_ss_customer)) 
- limit 100;
-with frequent_ss_items as
+ limit 100),
+
+ frequent_ss_items_two as
  (select substr(i_item_desc,1,30) itemdesc,i_item_sk item_sk,d_date solddate,count(*) cnt
   from store_sales
       ,date_dim
@@ -1285,7 +1289,7 @@ with frequent_ss_items as
     and d_year in (1999,1999 + 1,1999 + 2,1999 + 3)
   group by substr(i_item_desc,1,30),i_item_sk,d_date
   having count(*) >4),
- max_store_sales as
+ max_store_sales_two as
  (select max(csales) tpcds_cmax
   from (select c_customer_sk,sum(ss_quantity*ss_sales_price) csales
         from store_sales
@@ -1295,7 +1299,7 @@ with frequent_ss_items as
          and ss_sold_date_sk = d_date_sk
          and d_year in (1999,1999+1,1999+2,1999+3)
         group by c_customer_sk)),
- best_ss_customer as
+ best_ss_customer_two as
  (select c_customer_sk,sum(ss_quantity*ss_sales_price) ssales
   from store_sales
       ,customer
@@ -1303,7 +1307,7 @@ with frequent_ss_items as
   group by c_customer_sk
   having sum(ss_quantity*ss_sales_price) > (95/100.0) * (select
   *
- from max_store_sales))
+ from max_store_sales_two))
   select  c_last_name,c_first_name,sales
  from (select c_last_name,c_first_name,sum(cs_quantity*cs_list_price) sales
         from catalog_sales
@@ -1313,7 +1317,7 @@ with frequent_ss_items as
          and d_moy = 6 
          and cs_sold_date_sk = d_date_sk 
          and cs_item_sk in (select item_sk from frequent_ss_items)
-         and cs_bill_customer_sk in (select c_customer_sk from best_ss_customer)
+         and cs_bill_customer_sk in (select c_customer_sk from best_ss_customer_two)
          and cs_bill_customer_sk = c_customer_sk 
        group by c_last_name,c_first_name
       union all
@@ -1325,7 +1329,7 @@ with frequent_ss_items as
          and d_moy = 6 
          and ws_sold_date_sk = d_date_sk 
          and ws_item_sk in (select item_sk from frequent_ss_items)
-         and ws_bill_customer_sk in (select c_customer_sk from best_ss_customer)
+         and ws_bill_customer_sk in (select c_customer_sk from best_ss_customer_two)
          and ws_bill_customer_sk = c_customer_sk
        group by c_last_name,c_first_name) 
      order by c_last_name,c_first_name,sales
@@ -1369,7 +1373,8 @@ group by c_last_name
         ,i_current_price
         ,i_manager_id
         ,i_units
-        ,i_size)
+        ,i_size),
+        result_1 as(
 select c_last_name
       ,c_first_name
       ,s_store_name
@@ -1384,8 +1389,7 @@ having sum(netpaid) > (select 0.05*avg(netpaid)
 order by c_last_name
         ,c_first_name
         ,s_store_name
-;
-with ssales as
+), ssales_two as
 (select c_last_name
       ,c_first_name
       ,s_store_name
@@ -1426,13 +1430,13 @@ select c_last_name
       ,c_first_name
       ,s_store_name
       ,sum(netpaid) paid
-from ssales
+from ssales_two
 where i_color = 'plum'
 group by c_last_name
         ,c_first_name
         ,s_store_name
 having sum(netpaid) > (select 0.05*avg(netpaid)
-                           from ssales)
+                           from ssales_two)
 order by c_last_name
         ,c_first_name
         ,s_store_name
@@ -1991,7 +1995,8 @@ with inv as
         and inv_date_sk = d_date_sk
         and d_year =2001
       group by w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy) foo
- where case mean when 0 then 0 else stdev/mean end > 1)
+ where case mean when 0 then 0 else stdev/mean end > 1),
+ result_1 as(
 select inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean, inv1.cov
         ,inv2.w_warehouse_sk,inv2.i_item_sk,inv2.d_moy,inv2.mean, inv2.cov
 from inv inv1,inv inv2
@@ -2001,8 +2006,8 @@ where inv1.i_item_sk = inv2.i_item_sk
   and inv2.d_moy=3+1
 order by inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean,inv1.cov
         ,inv2.d_moy,inv2.mean, inv2.cov
-;
-with inv as
+),
+inv_two as
 (select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
        ,stdev,mean, case mean when 0 then null else stdev/mean end cov
  from(select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
@@ -2017,9 +2022,9 @@ with inv as
         and d_year =2001
       group by w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy) foo
  where case mean when 0 then 0 else stdev/mean end > 1)
-select inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean, inv1.cov
-        ,inv2.w_warehouse_sk,inv2.i_item_sk,inv2.d_moy,inv2.mean, inv2.cov
-from inv inv1,inv inv2
+select inv1.w_warehouse_sk wrsk,inv1.i_item_sk itemsk,inv1.d_moy d_moy,inv1.mean mean, inv1.cov cov
+        ,inv2.w_warehouse_sk wrsk2,inv2.i_item_sk itemsk2,inv2.d_moy d_moy2,inv2.mean mean2, inv2.cov cov2
+from inv_two inv1,inv_two inv2
 where inv1.i_item_sk = inv2.i_item_sk
   and inv1.w_warehouse_sk =  inv2.w_warehouse_sk
   and inv1.d_moy=3
