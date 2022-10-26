@@ -1860,17 +1860,17 @@ select
   cd_dep_count,
   count(*) cnt1,
   avg(cd_dep_count),
-  avg(cd_dep_count),
+  sum(cd_dep_count),
   min(cd_dep_count),
   cd_dep_employed_count,
   count(*) cnt2,
   avg(cd_dep_employed_count),
-  avg(cd_dep_employed_count),
+  sum(cd_dep_employed_count),
   min(cd_dep_employed_count),
   cd_dep_college_count,
   count(*) cnt3,
   avg(cd_dep_college_count),
-  avg(cd_dep_college_count),
+  sum(cd_dep_college_count),
   min(cd_dep_college_count)
  from
   customer c,customer_address ca,customer_demographics
