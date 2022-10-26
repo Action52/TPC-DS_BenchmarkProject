@@ -35,7 +35,7 @@ tables = ["call_center", "catalog_page", "catalog_returns", "catalog_sales",
              "time_dim", "warehouse", "web_page", "web_returns", "web_sales", "web_site"
             ]
 
-data_size = "2G"  # 2GB 4GB
+data_size = "3G"  # 2GB 4GB
 s3_bucket = "s3a://tpcds-spark/"
 db_name = "tpcds"
 schemas_location = "scripts/queries/table/"
@@ -74,14 +74,12 @@ def create_tables(relations, s3_bucket, db_name, schemas_location, data_size, sp
                      data_size=data_size, 
                      spark=spark)
 
-create_database(name=db_name)
-create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### Executing the queries and recording performance metrics
-# MAGIC In this section we will execute the TPC-DS queries provided to us. First, we parse the queries from 
+# MAGIC In this section we will execute the TPC-DS queries provided to us. First, we parse the queries from generated queries file from the templates. For each data size we will run each query and save the result to csv file. We will also collect statistical data regarding the execution time of each query.
 
 # COMMAND ----------
 
@@ -89,13 +87,16 @@ import csv
 
 def save_list_results(url, data):
     data_frame = spark.createDataFrame(Row(**x) for x in data)
-    data_frame.write.format("csv").mode("overwrite").option("header", "true").save(url)
+    data_frame.write.partitionBy('run_id').format("csv").mode("overwrite").option("header", "true").save(url)
 
 # COMMAND ----------
 
 from joblib import Parallel, delayed
+from multiprocessing.pool import Pool
+import traceback
 
 NUM_THREADS = 5
+NUM_POOLS = 10
 
 def load_queries(path_to_queries) -> list:
     with open(path_to_queries) as file_obj:
@@ -137,6 +138,8 @@ def run_query(run_id, query_number, queries, path_to_save_results, data_size, pr
             print(result.show())
         return stats
     except Exception as e:
+        #print(query_number)
+        #print(traceback.print_exc())
         return {
             "run_id": run_id,
             "query_id": query_number,
@@ -148,38 +151,14 @@ def run_query(run_id, query_number, queries, path_to_save_results, data_size, pr
         }
 
 def run_queries(run_id, queries, path_to_save_results, path_to_save_stats, data_size, print_result=False):
-    # print("running queries", path_to_save_results, path_to_save_stats)
-    # stats = []
-    # for i in range(len(queries)):
-    #     stats.append(run_query(run_id, i+1, queries, path_to_save_results, data_size, True))
-    stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries)))
-    # print(stats)
+    with Pool(processes=NUM_POOLS) as pool:
+        stats = pool.starmap(run_query, [(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries))])
+#     stats = Parallel(n_jobs=NUM_THREADS, prefer="threads")(delayed(run_query)(run_id, i+1, queries, path_to_save_results, data_size, print_result) for i in range(len(queries)))
     save_list_results(path_to_save_stats, stats)
 
 # COMMAND ----------
 
-# queries = load_queries("scripts/queries_1G.sql")
-# # # run_query(1, 5, queries, "s3://tpcds-spark/results/1G/test_run_csv", print_result=True)
-# run_queries(1, queries, "s3://tpcds-spark/results/1G/test_run_csv", "s3://tpcds-spark/stats/1G/test_run_stats_csv")
-
-def run_test():
-    # Run all the dataset from 1G, 2G, and 4G
-    data_sizes = ["4G"] # , "4G"]
-    
-    for i, data_size in enumerate(data_sizes):
-        queries_path = "scripts/queries_generated/queries_{size}_Fixed.sql".format(size=data_size)
-        result_path = "s3a://tpcds-spark/results/{size}/{query_number}/test_run_csv"
-        stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
-        create_database(name=db_name)
-        create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
-        queries = load_queries(queries_path)[0:10]
-        print("Processing queries")
-        run_queries(i+1, queries, result_path, stats_path, data_size)
-        
-def run():
-    # Run all the dataset from 1G, 2G, and 4G
-    data_sizes = ["1G", "2G", "4G"]
-    
+def run(data_sizes=['1G', '2G', '3G', '4G']):    
     for i, data_size in enumerate(data_sizes):
         queries_path = "scripts/queries_generated/queries_{size}_Fixed.sql".format(size=data_size)
         result_path = "s3a://tpcds-spark/results/{size}/{query_number}/test_run_csv"
@@ -190,10 +169,13 @@ def run():
         
         # Load queries for the given size
         queries = load_queries(queries_path)
+        #queries_need_to_be_fixed = [queries[13], queries[22], queries[23], queries[34], queries[38]]
+        
         run_queries(i+1, queries, result_path, stats_path, data_size)
 
 # COMMAND ----------
 
+# Please don't run full pipeline unless ready, try with run(data_sizes=['1G'])
 run()
 
 # COMMAND ----------
@@ -268,8 +250,8 @@ get_visualization_tables_per_scale_for_all()
 
 # COMMAND ----------
 
-data_sizes = ["1G", "2G", "4G"]#, "2G", "3G"] #  ["1G", 2G", "4G"]
-dfs=[]
+data_sizes = ["1G", "2G", "4G"]
+dfs=[]zx
 for i, data_size in enumerate(data_sizes):
     stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
     schema = types.StructType([types.StructField("run_id", types.IntegerType(), True), 
