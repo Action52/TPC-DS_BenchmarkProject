@@ -6,19 +6,15 @@
     "job_cluster_key": "tpcds-cluster",
     "notebook_task": {
       "source": "GIT",
-      "notebook_path": "test.ipynb",
-      "base_parameters": {
-        "mail_to_send_report": "leonvillapun@gmail.com",
-        "aws_key": "AKIAXXXAAHQTR5OI3QRB",
-        "aws_secret": "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"
-      }
+      "notebook_path": "tpcds-spark.ipynb",
+      "base_parameters": {}
     },
     "email_notifications": {
       "on_success": [
-        "luis.leon.villapun@ulb.be"
+        null
       ],
       "on_failure": [
-        "luis.leon.villapun@ulb.be"
+        null
       ]
     }
   }, {
@@ -32,7 +28,9 @@
       "source": "GIT",
       "notebook_path": "send_report.ipynb",
       "base_parameters": {
-        "mail_to_send_report": "leonvillapun@gmail.com"
+        "mail_to_send_report": null,
+        "aws_key": null,
+        "aws_secret": null
       }
     },
     "email_notifications": {
