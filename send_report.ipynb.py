@@ -111,8 +111,6 @@ def send_email(from_email, to_email, subject, body_html, attachments=[], cc=[], 
             mime_images.append(mime_img)
         else:
             attachment_ready_html.append(l)
-            print("Added {} images".format(img_id))
-            
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = from_email
