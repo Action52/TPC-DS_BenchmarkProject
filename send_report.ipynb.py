@@ -1,4 +1,13 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # Send Report to Stakeholders
+# MAGIC 
+# MAGIC This notebook retrieves the results of the last run of tpc-ds, generates interesting visualizations, and sends them to the stakeholder to take decisions.
+# MAGIC 
+# MAGIC ### Visualization and Stats retrieving Functions
+
+# COMMAND ----------
+
 import pandas as pd
 from matplotlib import pyplot as plt
 import math
@@ -81,6 +90,11 @@ def retrieve_stats(data_sizes = ["1G", "2G", "3G", "4G"]):
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Methods to parse the images and send an email
+
+# COMMAND ----------
+
 # Code snippet extracted from https://docs.databricks.com/_static/notebooks/kb/notebooks/send-email-aws.html
 import boto3
 
@@ -154,6 +168,11 @@ def makeCompatibleImage(image, withLabel=False):
         val = "<img src='data:image/png;base64,%s'>" % (contents)
     displayHTML(val)
     return val
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Parsing the visualizations and generating the email
 
 # COMMAND ----------
 
@@ -253,7 +272,10 @@ def create_mail_content():
 def previewHTMLEmail(html):
     displayHTML("\n".join([x for x in html if type(x) != type(type)]))
 html = create_mail_content()
-#previewHTMLEmail(html)
+
+# COMMAND ----------
+
+previewHTMLEmail(html)  # Display a preview of the html content that will be sent as an email.
 try:
     to_mail = dbutils.widgets.get("mail_to_send_report")
     aws_secret = dbutils.widgets.get("aws_secret")
@@ -262,8 +284,4 @@ except Exception as e:
     to_mail = "satria.wicaksono@ulb.be"
     aws_secret = None
     aws_key = None
-send_email("luis.leon.villapun@ulb.be", to_mail, "Test", body_html=html, access_key=aws_key, secret_key=aws_secret)
-
-# COMMAND ----------
-
-
+send_email("luis.leon.villapun@ulb.be", to_mail, "TPC-DS-Report", body_html=html, access_key=aws_key, secret_key=aws_secret)
