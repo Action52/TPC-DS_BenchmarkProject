@@ -3,18 +3,27 @@
 # MAGIC # Spark SQL TPC-DS
 # MAGIC ## Testing decision support queries on a Spark Databricks deployment.
 # MAGIC 
-# MAGIC The purpose of this notebook is to execute the tpc-ds benchmark on a spark environment in the cloud. Modern implementations of data warehouses are almost certainly on the cloud. Let's evaluate how they behave assuming a small system (for testing and cost purposes). This testing framework works with scale factors of 1, 2, 3 and 4GB sizes.
-
-# COMMAND ----------
-
-# MAGIC %pip install tqdm
-# MAGIC %pip install joblib
+# MAGIC The purpose of this notebook is to execute the TPC-DS benchmark on a Spark environment in the cloud. Modern implementations of data warehouses are almost certainly on the cloud. Let's evaluate how they behave assuming a small system (for testing and cost purposes). This testing framework works with scale factors of 1, 2, 3 and 4GB sizes.
+# MAGIC 
+# MAGIC For the written report, we will run tests on the Databricks basic cluster with:
+# MAGIC - Databricks 11.0
+# MAGIC - Spark 3.3.0
+# MAGIC - Scala 2.1.12
+# MAGIC - Driver size m5d.large
+# MAGIC - 8GB Memory
+# MAGIC - 2 Cores
+# MAGIC 
+# MAGIC Feel free to create your own clusters and run the notebook on a custom cluster.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC #### Variables declaration
 # MAGIC Please run all the cells in order to perform the experiments. Change the data size when needed.
+
+# COMMAND ----------
+
+# MAGIC %pip install joblib
 
 # COMMAND ----------
 
@@ -173,98 +182,10 @@ def run(data_sizes=['1G']):
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Run the pipeline
+
+# COMMAND ----------
+
 # Please don't run full pipeline unless ready, try with run(data_sizes=['1G'])
 run(data_sizes=['1G', '2G', '3G', '4G'])
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Visualization
-
-# COMMAND ----------
-
-import pandas as pd
-from matplotlib import pyplot as plt
-import math
-
-# COMMAND ----------
-
-
-def get_visualization_tables_per_scale():
-    data_sizes = ["1G", "2G", "3G","4G" ]# "3G"] #  ["1G", 2G", "4G"]
-    
-    for i, data_size in enumerate(data_sizes):
-        stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
-        schema = types.StructType([types.StructField("run_id", types.IntegerType(), True), 
-                           types.StructField("query_id", types.IntegerType(), True), 
-                           types.StructField("start_time", types.DoubleType(), True),
-                           types.StructField("end_time", types.DoubleType(), True),
-                           types.StructField("elapsed_time", types.DoubleType(), True),
-                           types.StructField("row_count", types.IntegerType(), True),
-                           types.StructField("error", types.BooleanType(), True)
-                           ])
-        df_s = spark.read.option("header", "true").csv(stats_path, schema)
-        df= df_s.toPandas()
-        #Time plot
-        df.plot(x="query_id", y="elapsed_time", kind="bar", figsize=(20,10), title=f"Query runtime for scale factor {data_size}")
-
-def get_visualization_tables_per_scale_for_all():
-    data_sizes = ["1G", "2G", "3G","4G"]#, "2G", "3G"] #  ["1G", 2G", "4G"]
-    dfs=[]
-    for i, data_size in enumerate(data_sizes):
-        stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
-        schema = types.StructType([types.StructField("run_id", types.IntegerType(), True), 
-                           types.StructField("query_id", types.IntegerType(), True), 
-                           types.StructField("start_time", types.DoubleType(), True),
-                           types.StructField("end_time", types.DoubleType(), True),
-                           types.StructField("elapsed_time", types.DoubleType(), True),
-                           types.StructField("row_count", types.IntegerType(), True),
-                           types.StructField("error", types.BooleanType(), True)
-                           ])
-        df_s = spark.read.option("header", "true").csv(stats_path, schema)
-        df= df_s.toPandas()
-        df['scale'] = data_size
-        dfs.append(df)
-
-    df_final=pd.concat(dfs, ignore_index=True)
-    #General plot
-    df_final.pivot(index='query_id', columns='scale', values='elapsed_time').plot(kind='bar', rot=0, figsize=(20,10), title="Query runtimes across scale factors")
-    plt.tight_layout()
-    plt.show()
-
-    #Plots per queries
-    grouped = df_final.groupby('query_id')
-    
-    nrows = int(math.ceil(len(grouped)/2.))
-    fig, axs = plt.subplots(nrows,2)
-
-    for (name, df), ax in zip(grouped, axs.flat):
-        df.plot(x='scale',y='elapsed_time', ax=ax, title=str(name), figsize=(20,50))
-
-# COMMAND ----------
-
-get_visualization_tables_per_scale()
-get_visualization_tables_per_scale_for_all()
-
-# COMMAND ----------
-
-data_sizes = ["1G", "2G", "3G","4G"]
-dfs=[]
-for i, data_size in enumerate(data_sizes):
-    stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
-    schema = types.StructType([types.StructField("run_id", types.IntegerType(), True), 
-                           types.StructField("query_id", types.IntegerType(), True), 
-                           types.StructField("start_time", types.DoubleType(), True),
-                           types.StructField("end_time", types.DoubleType(), True),
-                           types.StructField("elapsed_time", types.DoubleType(), True),
-                           types.StructField("row_count", types.IntegerType(), True),
-                           types.StructField("error", types.BooleanType(), True)
-                           ])
-    df_s = spark.read.option("header", "true").csv(stats_path, schema)
-    df= df_s.toPandas()
-    df['scale'] = data_size
-    df_s.show(n=99)
-
-# COMMAND ----------
-
-
