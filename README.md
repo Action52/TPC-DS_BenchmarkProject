@@ -22,6 +22,11 @@ Please install the databricks client on a clean python env in your computer:
 ```
 pip install databricks-cli
 ```
+or
+```
+sudo -H pip3 install databricks-cli
+```
+
 
 Once installed, assuming you have a databricks user with access data 
 (we provide a sample user on the written report of this project), run the command:
@@ -49,6 +54,18 @@ First, edit the scripts/run_tpcds_notebook_on_databricks.json file to contain yo
       "<YOUR-MAIL-HERE>"
     ]
   }
+```
+
+```
+ "aws_attributes": {
+            "first_on_demand": 0,
+            "availability": "SPOT_WITH_FALLBACK",
+            "zone_id": "us-east-1f",
+            "instance_profile_arn": "<YOUR-INSTANCE-ARN-HERE>"",
+            "spot_bid_price_percent": 100,
+            "ebs_volume_count": 0
+          },
+
 ```
 
 Then, also modify the base_parameters attached data to send the report, this includes the email of whoever you want to 

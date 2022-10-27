@@ -33,7 +33,6 @@ import os
 import logging
 from pyspark import SparkContext
 from pyspark.sql import Row, SQLContext, SparkSession, types
-from tqdm.notebook import tqdm_notebook
 import time
 
 # Variable definition
