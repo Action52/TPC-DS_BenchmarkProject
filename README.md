@@ -1,6 +1,6 @@
 # TPC-DS: Spark SQL Implementation using Databricks AWS
 * * *
-## Running on the pipeline
+## Running the pipeline
 ### Requirements and installation
 
 To use this repo we assume you have at least:
@@ -11,6 +11,9 @@ To use this repo we assume you have at least:
 - An AWS account with:
   - IAM Role set with ses:SendRawEmail policy.
   - A verified SES email receiver.
+
+Please be aware that if you're building the pipeline on your own, you'll have to modify several of the fields in the 
+run_tpcds_notebook_on_databricks_job.json accordingly, more specifically the fields pertaining the AWS arns, 
 
 If not, we provide a sample user and credentials on the written report of this project (only available for academic use).
 
@@ -64,7 +67,8 @@ Also consider that this email has to be previously whitelisted on AWS SES.
 databricks jobs configure --version=2.1     
 databricks jobs create --json-file scripts/run_tpcds_notebook_on_databricks_job.json
 ```
-
+Please take into account that this json file considers the creation of a single-node cluster since this is for testing purposes.
+Feel free to create a bigger cluster if you wish to have the computations working faster (also consider this will be much more costly).
 This json file will create a databricks job that will, when triggered, execute the jupyter notebook
 with the tpcds pipeline that we have generated. You can also check the notebooks manually at the databricks web UI.  
 Upon creation, the CLI will return a "job-id" that we can use to call the job.
@@ -86,8 +90,8 @@ databricks jobs run-now --job-id <JOB-ID>
 This will trigger the job that will first execute the notebook that performs the tpcds on 4 scale factors: 1G, 2G, 3G, and 4G.
 Then another notebook will be executed. This second notebook generates the visualizations of the experiments that were performed on the
 first notebook and sends the results to the stakeholder. If correctly executed, the CLI will return a run_id to track the job.
-Once completed, databricks will automatically send a notification of completion/failure to you and the report to the stakeholder.  
-
+Once completed, databricks will automatically send a notification of completion/failure to you and the report to the stakeholder. 
+The report might be considered as "spam" by your email provider so please check that section to look for the report.
 You can also check the results by checking the output of the run by:
 
 ```

@@ -61,7 +61,7 @@
             "first_on_demand": 0,
             "availability": "SPOT_WITH_FALLBACK",
             "zone_id": "us-east-1f",
-            "instance_profile_arn": "arn:aws:iam::531971980327:instance-profile/databricks-workspace-stack-5-access-data-buckets",
+            "instance_profile_arn": null,
             "spot_bid_price_percent": 100,
             "ebs_volume_count": 0
           },
