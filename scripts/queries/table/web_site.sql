@@ -1,5 +1,5 @@
-drop table if exists web_site_tmp;
-create table web_site_tmp(
+drop table if exists web_site;
+create table web_site(
     web_site_sk               int,
     web_site_id               string,
     web_rec_start_date        string,
@@ -26,7 +26,4 @@ create table web_site_tmp(
     web_country               string,
     web_gmt_offset            double,
     web_tax_percentage        double
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists web_site;
-create table web_site using parquet location '${path}/${name}/parquet' as (select * from web_site_tmp);
-drop table if exists web_site_tmp;
+) using parquet options ( path "${data_path}" )

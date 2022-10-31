@@ -52,7 +52,8 @@ with inv as
         and inv_date_sk = d_date_sk
         and d_year =[YEAR]
       group by w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy) foo
- where case mean when 0 then 0 else stdev/mean end > 1)
+ where case mean when 0 then 0 else stdev/mean end > 1),
+ result_1 as(
 select inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean, inv1.cov
         ,inv2.w_warehouse_sk,inv2.i_item_sk,inv2.d_moy,inv2.mean, inv2.cov
 from inv inv1,inv inv2
@@ -62,10 +63,8 @@ where inv1.i_item_sk = inv2.i_item_sk
   and inv2.d_moy=[MONTH]+1
 order by inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean,inv1.cov
         ,inv2.d_moy,inv2.mean, inv2.cov
-;
-
-
-with inv as
+),
+inv_two as
 (select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
        ,stdev,mean, case mean when 0 then null else stdev/mean end cov
  from(select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
@@ -80,9 +79,9 @@ with inv as
         and d_year =[YEAR]
       group by w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy) foo
  where case mean when 0 then 0 else stdev/mean end > 1)
-select inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean, inv1.cov
-        ,inv2.w_warehouse_sk,inv2.i_item_sk,inv2.d_moy,inv2.mean, inv2.cov
-from inv inv1,inv inv2
+select inv1.w_warehouse_sk wrsk,inv1.i_item_sk itemsk,inv1.d_moy d_moy,inv1.mean mean, inv1.cov cov
+        ,inv2.w_warehouse_sk wrsk2,inv2.i_item_sk itemsk2,inv2.d_moy d_moy2,inv2.mean mean2, inv2.cov cov2
+from inv_two inv1,inv_two inv2
 where inv1.i_item_sk = inv2.i_item_sk
   and inv1.w_warehouse_sk =  inv2.w_warehouse_sk
   and inv1.d_moy=[MONTH]

@@ -1,5 +1,5 @@
-drop table if exists catalog_sales_tmp;
-create table catalog_sales_tmp (
+drop table if exists catalog_sales;
+create table catalog_sales (
   cs_sold_date_sk integer, 
   cs_sold_time_sk integer, 
   cs_ship_date_sk integer, 
@@ -34,7 +34,4 @@ create table catalog_sales_tmp (
   cs_net_paid_inc_ship decimal(7, 2), 
   cs_net_paid_inc_ship_tax decimal(7, 2), 
   cs_net_profit decimal(7, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists catalog_sales;
-create table catalog_sales using parquet location '${path}/${name}/parquet' as (select * from catalog_sales_tmp);
-drop table if exists catalog_sales_tmp;
+) using parquet options ( path "${data_path}" )

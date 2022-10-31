@@ -1,5 +1,5 @@
-drop table if exists call_center_tmp;
-create table call_center_tmp (
+drop table if exists call_center;
+create table call_center (
   cc_call_center_sk integer, 
   cc_call_center_id string, 
   cc_rec_start_date date,
@@ -31,7 +31,4 @@ create table call_center_tmp (
   cc_country string, 
   cc_gmt_offset decimal(5, 2), 
   cc_tax_percentage decimal(5, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if  exists call_center;
-create table call_center using parquet location '${path}/${name}/parquet' as (select * from call_center_tmp);
-drop table if exists call_center_tmp;
+) using parquet options ( path "${data_path}" )

@@ -1,5 +1,5 @@
-drop table if exists store_tmp;
-create table store_tmp (
+drop table if exists store;
+create table store (
   s_store_sk integer, 
   s_store_id string, 
   s_rec_start_date date, 
@@ -29,7 +29,4 @@ create table store_tmp (
   s_country string, 
   s_gmt_offset decimal(5, 2), 
   s_tax_precentage decimal(5, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists store;
-create table store using parquet location '${path}/${name}/parquet' as (select * from store_tmp);
-drop table if exists store_tmp;
+) using parquet options ( path "${data_path}" )

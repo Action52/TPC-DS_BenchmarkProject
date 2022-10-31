@@ -1,5 +1,5 @@
-drop table if exists catalog_returns_tmp;
-create table catalog_returns_tmp (
+drop table if exists catalog_returns;
+create table catalog_returns (
   cr_returned_date_sk integer, 
   cr_returned_time_sk integer, 
   cr_item_sk integer, 
@@ -27,7 +27,4 @@ create table catalog_returns_tmp (
   cr_reversed_charge decimal(7, 2), 
   cr_store_credit decimal(7, 2), 
   cr_net_loss decimal(7, 2)
-) using csv options(header "false", delimiter "|", path "${path}/${name}.dat");
-drop table if exists catalog_returns;
-create table catalog_returns using parquet location '${path}/${name}/parquet' as (select * from catalog_returns_tmp);
-drop table if exists catalog_returns_tmp;
+) using parquet options ( path "${data_path}" )
