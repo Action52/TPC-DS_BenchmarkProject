@@ -62,12 +62,51 @@ def runtime_per_query_per_scale(df_final):
     grouped = df_final.groupby('query_id')
     grouped_names = [(df, name) for (name, df) in grouped]
     return grouped_names
+  
+def get_visualization_for_overall_stats(data_sizes = ["1G", "2G", "3G","4G"]):
+    dfs=[]
+    for i, data_size in enumerate(data_sizes):
+        stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
+        schema = types.StructType([types.StructField("batch_id", types.IntegerType(), True), 
+                           types.StructField("create_db_time", types.DoubleType(), True),
+                           types.StructField("run_query_time", types.DoubleType(), True)
+                           ])
+        df_s = spark.read.option("header", "true").csv(stats_path, schema)
+        df_s = df_s.orderBy('batch_id')
+        df = df_s.toPandas()
+        df['scale'] = data_size
+        dfs.append(df)
+
+    df_final=pd.concat(dfs, ignore_index=True)
+
+    #General plot
+    df_final.pivot(index='batch_id', columns='scale', values='run_query_time')
+    #Plots per queries
+    grouped = df_final.groupby('batch_id')
+    grouped_names = [(df, name) for (name, df) in grouped]
+    return grouped_names
 
 # COMMAND ----------
 
 from pyspark.sql import types
 from pyspark.sql.functions import col
 
+def retrieve_overall_stats(data_sizes = ["1G", "2G", "3G", "4G"]):
+    dfs=[]
+    for i, data_size in enumerate(data_sizes):
+        stats_path = "s3a://tpcds-spark/results/{size}/overall_stats_csv".format(size=data_size)
+        schema = types.StructType([
+                               types.StructField("batch_id", types.IntegerType(), True), 
+                               types.StructField("create_db_time", types.DoubleType(), True),
+                               types.StructField("run_query_time", types.DoubleType(), True)
+                               ])
+        df_s = spark.read.option("header", "true").csv(stats_path, schema)
+        df = df_s.toPandas()
+        df['scale'] = data_size
+        dfs.append(df)
+    final_df = pd.concat(dfs)
+    return final_df
+  
 def retrieve_stats(data_sizes = ["1G", "2G", "3G", "4G"]):
     dfs=[]
     for i, data_size in enumerate(data_sizes):
@@ -241,6 +280,26 @@ def create_mail_content():
             html.append("</td>")
         html.append("</tr>")
     html.append("</tbody></table>")
+    html.append("<h3>Overall Stats</h3>")
+    overall_stats = retrieve_overall_stats()
+    html.append("""
+    <table>
+        <thead>
+            <tr>
+                <th>batch_id</th>
+                <th>create_db_time</th>
+                <th>run_query_time</th>
+                <th>scale</th>
+            </tr>
+        </thead>
+        <tbody>
+    """)
+    for idx, row in overall_stats.iterrows():
+        html.append("<tr>")
+        for column in overall_stats.columns:
+            html.append(f"<td>{row[column]}</td>")
+        html.append("</tr>")
+    html.append("</tbody></table>")
     html.append("<h3>All stats displayed</h3>")
     stats = retrieve_stats()
     for stat in stats:
@@ -248,11 +307,11 @@ def create_mail_content():
         <table>
             <thead>
               <tr>
-                <th>run_id</th>
                 <th>query_id</th>
                 <th>elapsed_time</th>
                 <th>row_count</th>
                 <th>error</th>
+                <th>run_id</th>
                 <th>scale</th>
               </tr>
             </thead>
@@ -285,3 +344,7 @@ except Exception as e:
     aws_secret = None
     aws_key = None
 send_email("luis.leon.villapun@ulb.be", to_mail, "TPC-DS-Report", body_html=html, access_key=aws_key, secret_key=aws_secret)
+
+# COMMAND ----------
+
+
