@@ -184,11 +184,11 @@ def run(data_sizes=['1G']):
         run_queries(i+1, queries, result_path, stats_path, data_size)
         end_run = time.time()
         
-        overall_stats = {
-            'data_size': data_size,
+        overall_stats = [{
+            'batch_id': i+1,
             'create_db_time': start_create_db - end_create_db,
             'run_query_time': start_run - end_run
-        }
+        }]
         
         overall_stats_path = "s3a://tpcds-spark/results/{size}/overall_stats_csv".format(size=data_size)
         save_list_results(overall_stats_path, overall_stats)
