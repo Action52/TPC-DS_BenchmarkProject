@@ -169,15 +169,30 @@ def run(data_sizes=['1G']):
         queries_path = "scripts/queries_generated/queries_{size}_Fixed.sql".format(size=data_size)
         result_path = "s3a://tpcds-spark/results/{size}/{query_number}/test_run_csv"
         stats_path = "s3a://tpcds-spark/results/{size}/test_run_stats_csv".format(size=data_size)
+        
+        start_create_db = time.time()
         # Create metastore for the given size
         create_database(name=db_name)
         create_tables(tables, s3_bucket, db_name, schemas_location, data_size, spark)
+        end_create_db = time.time()
         
         # Load queries for the given size
         queries = load_queries(queries_path)
 #         queries_need_to_be_fixed = [queries[13], queries[22], queries[23], queries[34], queries[38]]
-        
+
+        start_run = time.time()
         run_queries(i+1, queries, result_path, stats_path, data_size)
+        end_run = time.time()
+        
+        overall_stats = {
+            'data_size': data_size,
+            'create_db_time': start_create_db - end_create_db,
+            'run_query_time': start_run - end_run
+        }
+        
+        overall_stats_path = "s3a://tpcds-spark/results/{size}/overall_stats_csv".format(size=data_size)
+        save_list_results(overall_stats_path, overall_stats)
+
 
 # COMMAND ----------
 
